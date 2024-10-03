@@ -146,7 +146,7 @@
 		win.editBright = win.brightGroup.add("edittext{text:'0',characters:3,justify:'center',active:1}");
 		win.slider = win.brightGroup.add("slider", undefined, 100, 0, 100);
 		if (!isSmallMode) {
-			win.slider.size = "width:164,height:20";
+			win.slider.size = "width:168,height:20";
 			var spacing = 8;
 			var character = 5;
 		} else {
@@ -253,8 +253,10 @@
 			}
 
 			editor.oc.can.onClick = function () {
-				colorPicker.copyArr(_this.outputColour, _this.inputColour);
+				// colorPicker.copyArr(_this.outputColour, _this.inputColour);
+				_this.outputColour = null;
 				win.close();
+				// return null;
 			}
 
 		}
