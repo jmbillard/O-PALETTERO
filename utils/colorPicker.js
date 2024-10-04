@@ -254,7 +254,7 @@
 
 			editor.oc.can.onClick = function () {
 				// colorPicker.copyArr(_this.outputColour, _this.inputColour);
-				_this.outputColour = null;
+				_this.outputColour = false;
 				win.close();
 				// return null;
 			}

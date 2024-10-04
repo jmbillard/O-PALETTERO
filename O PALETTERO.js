@@ -70,34 +70,21 @@ function PALETTERO_UTL(thisObj) {
 		newUiCtrlObj.swatch.addEventListener('mouseout', function () {
 			drawColorButton(this, false);
 		});
-
+	
 		newUiCtrlObj.swatch.onClick = function () {
-			this.swatchColor = new colorPicker(this.swatchColor);
-			this.helpTip = this.text = color = rgbToHEX(this.swatchColor);
-			drawColorButton(this, false);
+			alert('clique esquerdo');
 		};
 
-		return newUiCtrlObj;
-	}
+		newUiCtrlObj.swatch.addEventListener('click', function (c) {
 
-	function themeBtn(sectionGrp, ctrlProperties) {
-		var newUiCtrlObj = {};
+			if (c.button == 2) {
 
-		newUiCtrlObj.button = sectionGrp.add('customButton');
-		newUiCtrlObj.button.text = ctrlProperties.text;
-		newUiCtrlObj.button.buttonColor = hexToRGB(divColor1);
-		newUiCtrlObj.button.textColor = hexToRGB(normalColor1);
-
-		newUiCtrlObj.button.minimumSize = [20, 20];
-
-		drawThemeButton(newUiCtrlObj.button, false);
-
-		newUiCtrlObj.button.addEventListener('mouseover', function () {
-			drawThemeButton(this, true);
-		});
-
-		newUiCtrlObj.button.addEventListener('mouseout', function () {
-			drawThemeButton(this, false);
+				try {
+					this.swatchColor = colorPicker(this.swatchColor);
+					this.helpTip = this.text = color = rgbToHEX(this.swatchColor);
+					drawColorButton(this, false);
+				} catch (err) { }
+			}
 		});
 
 		return newUiCtrlObj;
@@ -126,36 +113,59 @@ function PALETTERO_UTL(thisObj) {
 		};
 	}
 
-	function drawThemeButton(button, hover) {
-		var g = button.graphics;
-		var textPen = g.newPen(g.PenType.SOLID_COLOR, button.textColor, 1);
-		var pathPen = g.newPen(g.PenType.SOLID_COLOR, button.buttonColor, 2);
-		var fillBrush = g.newBrush(g.BrushType.SOLID_COLOR, button.buttonColor);
-		var textSize = g.measureString(button.text);
+	// function themeBtn(sectionGrp, ctrlProperties) {
+	// 	var newUiCtrlObj = {};
 
-		button.onDraw = function () {
+	// 	newUiCtrlObj.button = sectionGrp.add('customButton');
+	// 	newUiCtrlObj.button.text = ctrlProperties.text;
+	// 	newUiCtrlObj.button.buttonColor = hexToRGB(divColor1);
+	// 	newUiCtrlObj.button.textColor = hexToRGB(normalColor1);
 
-			var h = this.size.height;
-			var w = this.size.width;
+	// 	newUiCtrlObj.button.minimumSize = [20, 20];
 
-			if (hover) {
-				textPen = g.newPen(g.PenType.SOLID_COLOR, [1, 1, 1, 1], 1);
-				fillBrush = g.newBrush(g.BrushType.SOLID_COLOR, hexToRGB(highlightColor1));
-			}
-			g.newPath();
-			g.rectPath(0, 0, w, h);
-			g.fillPath(fillBrush);
-			g.strokePath(pathPen);
+	// 	drawThemeButton(newUiCtrlObj.button, false);
 
-			g.drawString(this.text, textPen, (w - textSize.width) / 2, (h - textSize.height) / 2);
-		};
-	}
+	// 	newUiCtrlObj.button.addEventListener('mouseover', function () {
+	// 		drawThemeButton(this, true);
+	// 	});
+
+	// 	newUiCtrlObj.button.addEventListener('mouseout', function () {
+	// 		drawThemeButton(this, false);
+	// 	});
+
+	// 	return newUiCtrlObj;
+	// }
+
+	// function drawThemeButton(button, hover) {
+	// 	var g = button.graphics;
+	// 	var textPen = g.newPen(g.PenType.SOLID_COLOR, button.textColor, 1);
+	// 	var pathPen = g.newPen(g.PenType.SOLID_COLOR, button.buttonColor, 2);
+	// 	var fillBrush = g.newBrush(g.BrushType.SOLID_COLOR, button.buttonColor);
+	// 	var textSize = g.measureString(button.text);
+
+	// 	button.onDraw = function () {
+
+	// 		var h = this.size.height;
+	// 		var w = this.size.width;
+
+	// 		if (hover) {
+	// 			textPen = g.newPen(g.PenType.SOLID_COLOR, [1, 1, 1, 1], 1);
+	// 			fillBrush = g.newBrush(g.BrushType.SOLID_COLOR, hexToRGB(highlightColor1));
+	// 		}
+	// 		g.newPath();
+	// 		g.rectPath(0, 0, w, h);
+	// 		g.fillPath(fillBrush);
+	// 		g.strokePath(pathPen);
+
+	// 		g.drawString(this.text, textPen, (w - textSize.width) / 2, (h - textSize.height) / 2);
+	// 	};
+	// }
 
 	// Altera a cor de fundo da janela.
 	function setBgColor(w, hex) {
-		var color = hexToRGB(hex); // Converte a cor hexadecimal em RGB.
-		var bType = w.graphics.BrushType.SOLID_COLOR; // Define o tipo do pincel como cor sólida.
-		w.graphics.backgroundColor = w.graphics.newBrush(bType, color); // Aplica o pincel com a nova cor à janela.
+		var color = hexToRGB(hex);
+		var bType = w.graphics.BrushType.SOLID_COLOR;
+		w.graphics.backgroundColor = w.graphics.newBrush(bType, color);
 	}
 
 	function PAL_WINDOW(thisObj) {
@@ -220,14 +230,18 @@ function PALETTERO_UTL(thisObj) {
 
 		addBtn.onClick = function () {
 
-			var newColor = new colorPicker();
-
-			if (newColor == null) return;
-
-			new colorBtn(swatchesGrp, newColor);
-			PAL_layout();
+			try {
+				new colorBtn(swatchesGrp, new colorPicker());
+				PAL_layout();
+			} catch (err) { }
 		};
 
+		// addBtn.addEventListener('click', function (c) {
+		// 	if (c.button == 2) {
+		// 		// this.parent.children[1].notify();
+		// 	}
+		// });
+	
 		PAL_w.onShow = PAL_w.onResizing = PAL_w.onResize = function () {
 			PAL_layout();
 		};
