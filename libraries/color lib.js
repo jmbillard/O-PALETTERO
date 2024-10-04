@@ -45,6 +45,17 @@ function componentToHex(c) {
 // 	].join('').toUpperCase();
 // }
 
+function rgbToRGB(rgbArray) {
+
+	var RGBArray = [];
+
+	for (var i = 0; i < rgbArray.length; i++) {
+
+		RGBArray.push(Math.round(rgbArray[i] * 255));
+	}
+	return RGBArray;
+}
+
 function rgbToHEX(rgbArray) {
 	var a = (rgbArray[0] * 255).toString(16);
 	var b = (rgbArray[1] * 255).toString(16);

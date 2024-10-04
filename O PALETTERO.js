@@ -25,23 +25,48 @@ function PALETTERO_UTL(thisObj) {
 	var highlightColor2 = '#8640BF';
 
 	var colorArray = [
-		'#F44336',
-		'#E81D62',
-		'#9B26AF',
-		'#6639B6',
-		'#3E50B4',
-		'#02A8F3',
-		'#00BBD3',
-		'#009587',
-		'#8AC249',
-		'#CCDB38',
-		'#FEEA3A',
-		'#FE9700',
+		'#05A6FF',
+		'#80D2FF',
+		'#8800f8',
+		'#8640BF',
+		'#004266',
+		// '#F44336',
+		// '#E81D62',
+		// '#9B26AF',
+		// '#6639B6',
+		// '#3E50B4',
+		// '#02A8F3',
+		// '#00BBD3',
+		// '#009587',
+		// '#8AC249',
+		// '#CCDB38',
+		// '#FEEA3A',
+		// '#FE9700',
 		// '#FF5722',
 		// '#785447',
 		// '#9D9D9D',
 		// '#5F7C8A'
 	]
+
+	// function limitArrayMaxValue(array, limit) {
+
+	// 	for (var i = 0; i < array.length; i++) {
+
+	// 		if (array[i] > limit) array[i] = limit;
+	// 	}
+
+	// 	return array;
+	// }
+
+	// function limitArrayMinValue(array, limit) {
+
+	// 	for (var i = 0; i < array.length; i++) {
+
+	// 		if (array[i] < limit) array[i] = limit;
+	// 	}
+
+	// 	return array;
+	// }
 
 	function colorBtn(sectionGrp, color) {
 		var newUiCtrlObj = {};
@@ -51,7 +76,7 @@ function PALETTERO_UTL(thisObj) {
 		var rgbArray = isHEX ? hexToRGB(color) : color;
 		var isDark = rgbToHsb(rgbArray)[2] < 80;
 
-		var textColor = isDark ? hexToRGB(monoColor0) : hexToRGB(bgColor1);
+		var textColor = isDark ? [1, 1, 1, 0.5] : [0, 0, 0, 0.5];//limitArrayMaxValue(rgbArray * 2, 1) : limitArrayMinValue(rgbArray / 2, 0.1);
 
 		newUiCtrlObj.swatch = sectionGrp.add('customButton');
 		newUiCtrlObj.swatch.text = hexCode;
@@ -59,7 +84,10 @@ function PALETTERO_UTL(thisObj) {
 		newUiCtrlObj.swatch.textColor = textColor;
 
 		newUiCtrlObj.swatch.minimumSize = [20, 20];
-		newUiCtrlObj.swatch.helpTip = color;
+		newUiCtrlObj.swatch.helpTip = [
+			'HEX: ' + hexCode,
+			'RGB: ' + rgbToRGB(rgbArray).join(', ')
+		].join('\n');
 
 		drawColorButton(newUiCtrlObj.swatch, false);
 
@@ -70,9 +98,22 @@ function PALETTERO_UTL(thisObj) {
 		newUiCtrlObj.swatch.addEventListener('mouseout', function () {
 			drawColorButton(this, false);
 		});
-	
+
 		newUiCtrlObj.swatch.onClick = function () {
-			alert('clique esquerdo');
+
+			var aItem = app.project.activeItem;
+			var selLayers = aItem != null ? aItem.selectedLayers : [];
+
+			if (selLayers.length == 0) return;
+
+			app.beginUndoGroup('O PALETTERO FILL ' + rgbToHEX(this.swatchColor));
+
+			for (var i = 0; i < selLayers.length; i++) {
+
+				applyFillColor(selLayers[i], this.swatchColor);
+			}
+
+			app.endUndoGroup();
 		};
 
 		newUiCtrlObj.swatch.addEventListener('click', function (c) {
@@ -81,7 +122,12 @@ function PALETTERO_UTL(thisObj) {
 
 				try {
 					this.swatchColor = colorPicker(this.swatchColor);
-					this.helpTip = this.text = color = rgbToHEX(this.swatchColor);
+					this.text = rgbToHEX(this.swatchColor);
+					this.helpTip = [
+						'HEX: ' + hexCode,
+						'RGB: ' + rgbToRGB(rgbArray).join(', ')
+					].join('\n');
+
 					drawColorButton(this, false);
 				} catch (err) { }
 			}
@@ -168,6 +214,40 @@ function PALETTERO_UTL(thisObj) {
 		w.graphics.backgroundColor = w.graphics.newBrush(bType, color);
 	}
 
+	function getPropertyColors(property, array) {
+
+		for (var i = 1; i <= property.numProperties; i++) {
+
+			var prop = property.property(i);
+
+			if (prop.numProperties > 0) {
+				getPropertyColors(prop);
+
+			} else {
+
+				try {
+
+					if (prop.value.length == 4) {
+						var val = prop.value;
+						val.pop();
+						array.push(val);
+					}
+				} catch (err) { }
+			}
+		}
+		return array;
+	}
+
+	function applyFillColor(layer, color) {
+		// fx...
+		var effects = layer.property('ADBE Effect Parade');
+
+		// 'fill' effect...
+		var fillFx = effects.addProperty('ADBE Fill');
+		fillFx.name = rgbToHEX(color);
+		fillFx.property('ADBE Fill-0002').setValue(color);
+	}
+
 	function PAL_WINDOW(thisObj) {
 		var PAL_w = thisObj;
 
@@ -222,6 +302,7 @@ function PALETTERO_UTL(thisObj) {
 					btnHeight
 				];
 				if ((PAL_w.size.width - 16) / swatchesCount < 50) swatch.text = '';
+				swatch.notify('onDraw');
 			}
 			PAL_w.minimumSize = [(swatchesCount + 1) * 20 + 24, 36];
 			PAL_w.layout.layout(true);
@@ -230,18 +311,69 @@ function PALETTERO_UTL(thisObj) {
 
 		addBtn.onClick = function () {
 
-			try {
-				new colorBtn(swatchesGrp, new colorPicker());
-				PAL_layout();
-			} catch (err) { }
+			var aItem = app.project.activeItem;
+			var selLayers = aItem != null ? aItem.selectedLayers : [];
+			var newColorsArray = [];
+
+			if (selLayers.length == 0) new colorBtn(swatchesGrp, new colorPicker());
+
+			for (var i = 0; i < selLayers.length; i++) {
+
+				var selProps = selLayers[i].selectedProperties;
+
+				if (selProps.length == 0) new colorBtn(swatchesGrp, new colorPicker());
+
+				getPropertyColors(selProps[0], newColorsArray);
+			}
+
+			for (var c = 0; c < newColorsArray.length; c++) {
+
+				try {
+					new colorBtn(swatchesGrp, new colorPicker(newColorsArray[c]));
+				} catch (err) { }
+			}
+			PAL_layout();
 		};
 
-		// addBtn.addEventListener('click', function (c) {
-		// 	if (c.button == 2) {
-		// 		// this.parent.children[1].notify();
-		// 	}
-		// });
-	
+		addBtn.addEventListener('click', function (c) {
+			if (c.button == 2) {
+
+				var aItem = app.project.activeItem;
+				var selLayers = aItem != null ? aItem.selectedLayers : [];
+				var newColorsArray = [];
+
+				if (selLayers.length == 0) return;
+
+				for (var i = 0; i < selLayers.length; i++) {
+
+					var effects = selLayers[i].property('ADBE Effect Parade');
+
+					var selProps = selLayers[i].selectedProperties;
+
+					if (selProps.length == 0) {
+
+						for (var e = 1; e <= effects.numProperties; e++) {
+
+							selProps.push(effects.property(e));
+						}
+					}
+
+					for (var p = 0; p < selProps.length; p++) {
+
+						getPropertyColors(selProps[p], newColorsArray);
+					}
+				}
+
+				for (var c = 0; c < newColorsArray.length; c++) {
+
+					try {
+						new colorBtn(swatchesGrp, newColorsArray[c]);
+					} catch (err) { }
+				}
+				PAL_layout();
+			}
+		});
+
 		PAL_w.onShow = PAL_w.onResizing = PAL_w.onResize = function () {
 			PAL_layout();
 		};

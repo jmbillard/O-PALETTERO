@@ -246,7 +246,7 @@
 		if (win.type == "dialog") {
 
 
-			editor.oc = win.editor.oc = win.add("Group{ok:Button{text:'Ok'},can:Button{text:'Cancel'}}");
+			editor.oc = win.editor.oc = win.add("Group{ok:Button{text:'aplicar'},can:Button{text:'cancelar'},rem:Button{text:'remover'}}");
 
 			editor.oc.ok.onClick = function () {
 				win.close();
@@ -513,7 +513,9 @@
 
 		win.addEventListener('keydown', function (k) {
 			if (k.keyName == "Escape") {
-				win.close();
+				editor.oc.can.notify();
+				// _this.outputColour = false;
+				// win.close();
 			}
 		});
 
