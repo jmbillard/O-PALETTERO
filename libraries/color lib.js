@@ -32,18 +32,18 @@ function componentToHex(c) {
 }
 
 // Converte um array RGB normalizado [0-1] para uma hexadecimal
-// function rgbToHEX(rgbArray) {
+function rgbToHEX(rgbArray) {
 
-// 	const r = Math.round(rgbArray[0] * 255);
-// 	const g = Math.round(rgbArray[1] * 255);
-// 	const b = Math.round(rgbArray[2] * 255);
+	const r = Math.round(rgbArray[0] * 255);
+	const g = Math.round(rgbArray[1] * 255);
+	const b = Math.round(rgbArray[2] * 255);
 
-// 	return ['#',
-// 		componentToHex(r),
-// 		componentToHex(g),
-// 		componentToHex(b)
-// 	].join('').toUpperCase();
-// }
+	return ['#',
+		componentToHex(r),
+		componentToHex(g),
+		componentToHex(b)
+	].join('').toUpperCase();
+}
 
 function rgbToRGB(rgbArray) {
 
@@ -56,21 +56,21 @@ function rgbToRGB(rgbArray) {
 	return RGBArray;
 }
 
-function rgbToHEX(rgbArray) {
-	var a = (rgbArray[0] * 255).toString(16);
-	var b = (rgbArray[1] * 255).toString(16);
-	var c = (rgbArray[2] * 255).toString(16);
-	if (a.length != 2) {
-		a = "0" + a;
-	}
-	if (b.length != 2) {
-		b = "0" + b;
-	}
-	if (c.length != 2) {
-		c = "0" + c;
-	}
-	return ('#' + a + b + c).toUpperCase();
-}
+// function rgbToHEX(rgbArray) {
+// 	var a = (rgbArray[0] * 255).toString(16);
+// 	var b = (rgbArray[1] * 255).toString(16);
+// 	var c = (rgbArray[2] * 255).toString(16);
+// 	if (a.length != 2) {
+// 		a = "0" + a;
+// 	}
+// 	if (b.length != 2) {
+// 		b = "0" + b;
+// 	}
+// 	if (c.length != 2) {
+// 		c = "0" + c;
+// 	}
+// 	return ('#' + a + b + c).toUpperCase();
+// }
 
 function hsbToRgb(hsbArray) {
 

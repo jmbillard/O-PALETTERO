@@ -246,7 +246,8 @@
 		if (win.type == "dialog") {
 
 
-			editor.oc = win.editor.oc = win.add("Group{ok:Button{text:'aplicar'},can:Button{text:'cancelar'},rem:Button{text:'remover'}}");
+			// editor.oc = win.editor.oc = win.add("Group{ok:Button{text:'aplicar'},can:Button{text:'cancelar'},rem:Button{text:'remover'}}");
+			editor.oc = win.editor.oc = win.add("Group{ok:Button{text:'aplicar'},can:Button{text:'cancelar'}}");
 
 			editor.oc.ok.onClick = function () {
 				win.close();
@@ -655,20 +656,39 @@
 	}
 
 	colorPicker.RgbToHex = function (rgb) {
-		var a = (rgb[0] * 255).toString(16);
-		var b = (rgb[1] * 255).toString(16);
-		var c = (rgb[2] * 255).toString(16);
-		if (a.length != 2) {
-			a = "0" + a;
+		function componentToHex(c) {
+
+			const hex = c.toString(16);
+
+			return hex.length == 1 ? '0' + hex : hex;
 		}
-		if (b.length != 2) {
-			b = "0" + b;
-		}
-		if (c.length != 2) {
-			c = "0" + c;
-		}
-		return (a + b + c).toUpperCase();
+
+		var r = Math.round(rgb[0] * 255);
+		var g = Math.round(rgb[1] * 255);
+		var b = Math.round(rgb[2] * 255);
+
+		return [
+			componentToHex(r),
+			componentToHex(g),
+			componentToHex(b)
+		].join('').toUpperCase();
 	}
+
+	// colorPicker.RgbToHex = function (rgb) {
+	// 	var a = (rgb[0] * 255).toString(16);
+	// 	var b = (rgb[1] * 255).toString(16);
+	// 	var c = (rgb[2] * 255).toString(16);
+	// 	if (a.length != 2) {
+	// 		a = "0" + a;
+	// 	}
+	// 	if (b.length != 2) {
+	// 		b = "0" + b;
+	// 	}
+	// 	if (c.length != 2) {
+	// 		c = "0" + c;
+	// 	}
+	// 	return (a + b + c).toUpperCase();
+	// }
 
 	colorPicker.HsbToRgb = function (hsb) {
 		var rgb = [];

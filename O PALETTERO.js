@@ -218,16 +218,18 @@ function PALETTERO_UTL(thisObj) {
 
 		for (var i = 1; i <= property.numProperties; i++) {
 
+			if (!property.property(i).isModified) continue;
+			
 			var prop = property.property(i);
-
+			
 			if (prop.numProperties > 0) {
-				getPropertyColors(prop);
-
+				getPropertyColors(prop, array);
+				
 			} else {
-
+				
 				try {
-
-					if (prop.value.length == 4) {
+					
+					if (prop.propertyValueType == 6418) {
 						var val = prop.value;
 						val.pop();
 						array.push(val);
@@ -235,9 +237,25 @@ function PALETTERO_UTL(thisObj) {
 				} catch (err) { }
 			}
 		}
+		// alert(array);
 		return array;
 	}
 
+	function getNestedProperties(property, array) {
+
+		for (var i = 1; i <= property.numProperties; i++) {
+
+			// alert(property.property(i).name);
+			if (property.property(i).numProperties > 0) {
+
+				getNestedProperties(property.property(i), array);
+			} else {
+				array.push(property.property(i));
+			}
+		}
+		return array;
+	}
+	
 	function applyFillColor(layer, color) {
 		// fx...
 		var effects = layer.property('ADBE Effect Parade');
@@ -326,6 +344,8 @@ function PALETTERO_UTL(thisObj) {
 				getPropertyColors(selProps[0], newColorsArray);
 			}
 
+			if (newColorsArray.length == 0) newColorsArray.push([1, 1, 1, 1]);
+
 			for (var c = 0; c < newColorsArray.length; c++) {
 
 				try {
@@ -346,16 +366,34 @@ function PALETTERO_UTL(thisObj) {
 
 				for (var i = 0; i < selLayers.length; i++) {
 
+					var contents = undefined;
 					var effects = selLayers[i].property('ADBE Effect Parade');
-
 					var selProps = selLayers[i].selectedProperties;
 
 					if (selProps.length == 0) {
 
-						for (var e = 1; e <= effects.numProperties; e++) {
+						// for (var e = 1; e <= effects.numProperties; e++) {
 
-							selProps.push(effects.property(e));
+						// 	selProps.push(effects.property(e));
+						// }
+						getPropertyColors(effects, newColorsArray);
+
+						if (selLayers[i] instanceof ShapeLayer) {
+
+							var contents = selLayers[i].property('ADBE Root Vectors Group');
+							// var shpPropsArray = getNestedProperties(contents, []);
+							getPropertyColors(contents, newColorsArray);
 						}
+
+						// 	selProps = selProps.concat(shpPropsArray);
+						// 	// alert(selProps.length);
+						// 	// getPropertyColors(contents, newColorsArray);
+						// 	// alert('é shape layer');
+						// 	// for (var e = 1; e <= contents.numProperties; e++) {
+						// 	// 	alert(contents.property(e).name);
+						// 	// 	selProps.push(contents.property(e));
+						// 	// }
+						// }
 					}
 
 					for (var p = 0; p < selProps.length; p++) {
