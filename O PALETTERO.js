@@ -10,6 +10,14 @@ function PALETTERO_UTL(thisObj) {
 	#include 'libraries/color lib.js';
 	#include 'libraries/metadata lib.js';
 
+	// Emojis e mensagens (opcional)
+	var lol = 'Σ(っ °Д °;)っ        ';
+	var relax = 'ヽ(✿ﾟ▽ﾟ)ノ        ';
+
+	var lClick = '◖  →  ';
+	var rClick = ' ◗  →  ';
+	var dClick = '◖◖ →  ';
+
 	// Cores do Style Guide GLOBO
 	var bgColor1 = '#0B0D0E';
 	var bgColor2 = '#060F13';
@@ -24,51 +32,144 @@ function PALETTERO_UTL(thisObj) {
 	var highlightColor1 = '#8800f8';
 	var highlightColor2 = '#8640BF';
 
-	var colorArray = [
-		'#05A6FF',
-		'#80D2FF',
-		'#8800f8',
-		'#8640BF',
-		'#004266',
-		// '#F44336',
-		// '#E81D62',
-		// '#9B26AF',
-		// '#6639B6',
-		// '#3E50B4',
-		// '#02A8F3',
-		// '#00BBD3',
-		// '#009587',
-		// '#8AC249',
-		// '#CCDB38',
-		// '#FEEA3A',
-		// '#FE9700',
-		// '#FF5722',
-		// '#785447',
-		// '#9D9D9D',
-		// '#5F7C8A'
-	]
+	// indexOf() definition...
+	if (!Array.prototype.indexOf) {
+		Array.prototype.indexOf = function (element, startPoint) {
+			var k;
 
-	// function limitArrayMaxValue(array, limit) {
+			if (this == null) {
+				throw new TypeError(
+					'"this" é nulo (null) ou não foi definido (undefined)',
+				);
+			}
+			var O = Object(this);
+			var aSize = O.length >>> 0;
 
-	// 	for (var i = 0; i < array.length; i++) {
+			if (aSize == 0) return -1;
 
-	// 		if (array[i] > limit) array[i] = limit;
-	// 	}
+			var n = +startPoint || 0;
 
-	// 	return array;
-	// }
+			if (Math.abs(n) == Infinity) n = 0;
 
-	// function limitArrayMinValue(array, limit) {
+			if (n >= aSize) return -1;
 
-	// 	for (var i = 0; i < array.length; i++) {
+			k = Math.max(n >= 0 ? n : aSize - Math.abs(n), 0);
 
-	// 		if (array[i] < limit) array[i] = limit;
-	// 	}
+			while (k < aSize) {
+				if (k in O && O[k] == element) return k;
 
-	// 	return array;
-	// }
+				k++;
+			}
+			return -1;
+		};
+	}
+
+	function saveProjectPalette(sectionGrp) {
+
+		var tempSwatchesArray = [];
+		var swatchesCount = sectionGrp.children.length;
+
+		if (swatchesCount == 0) return;
+
+		for (var s = 0; s < swatchesCount; s++) {
+
+			var swatch = sectionGrp.children[s];
+			var tempHEX = rgbToHEX(swatch.swatchColor);
+
+			tempSwatchesArray.push(tempHEX);
+		}
+
+		var mData = new XMPMeta(app.project.xmpPacket);
+		var schemaNS = XMPMeta.getNamespaceURI("xmp");
+		var propName = "xmp:Label";
+
+		try {
+			mData.setProperty(schemaNS, propName, tempSwatchesArray.join('-'));
+
+		} catch (err) {
+			alert(lol + '#PAL_01 - ' + err.message);
+		}
+
+		app.project.xmpPacket = mData.serialize();
+	}
+
+	function loadProjectPalette() {
+
+		var mData = new XMPMeta(app.project.xmpPacket);
+		var schemaNS = XMPMeta.getNamespaceURI("xmp");
+		var propName = "xmp:Label";
+
+		var swatchesArray = [
+			'#05A6FF',
+			'#80D2FF',
+			'#8800f8',
+			'#8640BF',
+			'#004266'
+		];
+
+		try {
+			var tempSwatchesArray = mData.getProperty(schemaNS, propName).toString().split('-');
+
+			if (tempSwatchesArray.length > 0) swatchesArray = tempSwatchesArray;
+
+		} catch (err) { }
+
+		return swatchesArray;
+	}
+
+	function PAL_layout(win) {
+
+		var w = win.size.width;
+		var h = win.size.height;
+		var isRow = w > h;
+		var edge = isRow ? w : h;
+
+		var swatchesGrp = win.children[1];
+		var btnGrp = win.children[0];
+
+		var grpOrientation = isRow ? 'row' : 'column';
+		var btnOrientation = isRow ? 'column' : 'row';
+
+		win.orientation = grpOrientation;
+		swatchesGrp.orientation = grpOrientation;
+		btnGrp.orientation = btnOrientation;
+
+		var swatchesCount = swatchesGrp.children.length;
+		var btnWidth = isRow ? (w - 24) / (swatchesCount + 1) : w - 16;
+		var btnHeight = isRow ? h - 16 : (h - 24) / (swatchesCount + 1);
+
+		for (var b = 0; b < btnGrp.children.length; b++) {
+
+			var btn = btnGrp.children[b];
+
+			btn.size = isRow ? [
+				btnWidth,
+				(btnHeight - 4) / 2
+			] : [
+				(btnWidth - 4) / 2,
+				btnHeight
+			];
+		}
+		for (var s = 0; s < swatchesCount; s++) {
+
+			var swatch = swatchesGrp.children[s];
+			swatch.text = rgbToHEX(swatch.swatchColor);
+
+			swatch.minimumSize = isRow ? [20, 44] : [44, 20];
+			swatch.size = [
+				btnWidth,
+				btnHeight
+			];
+			if ((edge - 16) / swatchesCount < 64) swatch.text = '';
+		}
+		win.minimumSize = isRow ? [(swatchesCount + 1) * 20 + 24, 36] : [36, (swatchesCount + 1) * 20 + 24];
+		win.layout.layout(true);
+		win.layout.resize();
+	}
+
 
 	function colorBtn(sectionGrp, color) {
+
 		var newUiCtrlObj = {};
 
 		var isHEX = color.toString().match(/^#/);
@@ -76,17 +177,22 @@ function PALETTERO_UTL(thisObj) {
 		var rgbArray = isHEX ? hexToRGB(color) : color;
 		var isDark = rgbToHsb(rgbArray)[2] < 80;
 
-		var textColor = isDark ? [1, 1, 1, 0.5] : [0, 0, 0, 0.5];//limitArrayMaxValue(rgbArray * 2, 1) : limitArrayMinValue(rgbArray / 2, 0.1);
+		var textColor = isDark ? [1, 1, 1, 0.5] : [0, 0, 0, 0.5];
 
 		newUiCtrlObj.swatch = sectionGrp.add('customButton');
 		newUiCtrlObj.swatch.text = hexCode;
 		newUiCtrlObj.swatch.swatchColor = rgbArray;
 		newUiCtrlObj.swatch.textColor = textColor;
 
-		newUiCtrlObj.swatch.minimumSize = [20, 20];
+		newUiCtrlObj.swatch.minimumSize = [20, 44];
 		newUiCtrlObj.swatch.helpTip = [
 			'HEX: ' + hexCode,
-			'RGB: ' + rgbToRGB(rgbArray).join(', ')
+			'RGB: ' + rgbToRGB(rgbArray).join(', '),
+			'',
+			lClick + 'aplicar fill',
+			rClick + 'editar cor',
+			'',
+			'Alt + ' + rClick + 'excluir cor'
 		].join('\n');
 
 		drawColorButton(newUiCtrlObj.swatch, false);
@@ -120,15 +226,35 @@ function PALETTERO_UTL(thisObj) {
 
 			if (c.button == 2) {
 
+				if (ScriptUI.environment.keyboardState.altKey) {
+
+					var pGrp = this.parent;
+					var win = pGrp.parent;
+					var bGrp = win.children[0];
+					pGrp.remove(this);
+
+					saveProjectPalette(sectionGrp);
+					PAL_layout(win);
+
+					return;
+				}
+
 				try {
 					this.swatchColor = colorPicker(this.swatchColor);
 					this.text = rgbToHEX(this.swatchColor);
 					this.helpTip = [
 						'HEX: ' + hexCode,
-						'RGB: ' + rgbToRGB(rgbArray).join(', ')
+						'RGB: ' + rgbToRGB(rgbArray).join(', '),
+						'',
+						lClick + 'aplicar fill',
+						rClick + 'editar cor',
+						'',
+						'Alt + ' + lClick + 'excluir cor'
 					].join('\n');
 
 					drawColorButton(this, false);
+					saveProjectPalette(sectionGrp);
+
 				} catch (err) { }
 			}
 		});
@@ -155,60 +281,13 @@ function PALETTERO_UTL(thisObj) {
 			g.fillPath(fillBrush);
 			g.strokePath(pathPen);
 
-			g.drawString(this.text, textPen, (w - textSize.width) / 2, h / 2 - textSize.height);
+			g.drawString(this.text, textPen, 10, 0);
 		};
 	}
 
-	// function themeBtn(sectionGrp, ctrlProperties) {
-	// 	var newUiCtrlObj = {};
-
-	// 	newUiCtrlObj.button = sectionGrp.add('customButton');
-	// 	newUiCtrlObj.button.text = ctrlProperties.text;
-	// 	newUiCtrlObj.button.buttonColor = hexToRGB(divColor1);
-	// 	newUiCtrlObj.button.textColor = hexToRGB(normalColor1);
-
-	// 	newUiCtrlObj.button.minimumSize = [20, 20];
-
-	// 	drawThemeButton(newUiCtrlObj.button, false);
-
-	// 	newUiCtrlObj.button.addEventListener('mouseover', function () {
-	// 		drawThemeButton(this, true);
-	// 	});
-
-	// 	newUiCtrlObj.button.addEventListener('mouseout', function () {
-	// 		drawThemeButton(this, false);
-	// 	});
-
-	// 	return newUiCtrlObj;
-	// }
-
-	// function drawThemeButton(button, hover) {
-	// 	var g = button.graphics;
-	// 	var textPen = g.newPen(g.PenType.SOLID_COLOR, button.textColor, 1);
-	// 	var pathPen = g.newPen(g.PenType.SOLID_COLOR, button.buttonColor, 2);
-	// 	var fillBrush = g.newBrush(g.BrushType.SOLID_COLOR, button.buttonColor);
-	// 	var textSize = g.measureString(button.text);
-
-	// 	button.onDraw = function () {
-
-	// 		var h = this.size.height;
-	// 		var w = this.size.width;
-
-	// 		if (hover) {
-	// 			textPen = g.newPen(g.PenType.SOLID_COLOR, [1, 1, 1, 1], 1);
-	// 			fillBrush = g.newBrush(g.BrushType.SOLID_COLOR, hexToRGB(highlightColor1));
-	// 		}
-	// 		g.newPath();
-	// 		g.rectPath(0, 0, w, h);
-	// 		g.fillPath(fillBrush);
-	// 		g.strokePath(pathPen);
-
-	// 		g.drawString(this.text, textPen, (w - textSize.width) / 2, (h - textSize.height) / 2);
-	// 	};
-	// }
-
 	// Altera a cor de fundo da janela.
 	function setBgColor(w, hex) {
+
 		var color = hexToRGB(hex);
 		var bType = w.graphics.BrushType.SOLID_COLOR;
 		w.graphics.backgroundColor = w.graphics.newBrush(bType, color);
@@ -218,44 +297,35 @@ function PALETTERO_UTL(thisObj) {
 
 		for (var i = 1; i <= property.numProperties; i++) {
 
+			var valCheck = property.property(i).value == [1, 0, 0, 1];
+
 			if (!property.property(i).isModified) continue;
-			
+
 			var prop = property.property(i);
-			
+
 			if (prop.numProperties > 0) {
 				getPropertyColors(prop, array);
-				
+
 			} else {
-				
+
 				try {
 					
 					if (prop.propertyValueType == 6418) {
 						var val = prop.value;
 						val.pop();
-						array.push(val);
+						var refHEX = rgbToHEX(val);
+
+						if (array.indexOf(refHEX) >= 0) continue;
+						
+						array.push(refHEX);
 					}
 				} catch (err) { }
 			}
 		}
-		// alert(array);
+
 		return array;
 	}
 
-	function getNestedProperties(property, array) {
-
-		for (var i = 1; i <= property.numProperties; i++) {
-
-			// alert(property.property(i).name);
-			if (property.property(i).numProperties > 0) {
-
-				getNestedProperties(property.property(i), array);
-			} else {
-				array.push(property.property(i));
-			}
-		}
-		return array;
-	}
-	
 	function applyFillColor(layer, color) {
 		// fx...
 		var effects = layer.property('ADBE Effect Parade');
@@ -268,6 +338,7 @@ function PALETTERO_UTL(thisObj) {
 
 	function PAL_WINDOW(thisObj) {
 		var PAL_w = thisObj;
+		var colorArray = loadProjectPalette();
 
 		if (!(thisObj instanceof Panel)) PAL_w = new Window('palette', scriptName + ' ' + scriptVersion, undefined, { resizeable: true }); // Cria uma nova janela
 		PAL_w.minimumSize = [(colorArray.length + 1) * 20 + 24, 36];
@@ -279,12 +350,20 @@ function PALETTERO_UTL(thisObj) {
 		btnGrp.orientation = 'column';
 		btnGrp.spacing = 4;
 
-		// var addBtn = new themeBtn(btnGrp, { text: '+' });
-		// var editBtn = new themeBtn(btnGrp, { text: '≡' });
 		var addBtn = btnGrp.add('button', undefined, '+');
-		addBtn.minimumSize = [20, 8];
-		var editBtn = btnGrp.add('button', undefined, '≡');
-		editBtn.minimumSize = [20, 8];
+		addBtn.minimumSize = [20, 20];
+		addBtn.helpTip = [
+			lClick + 'adicionar uma nova cor',
+			'Alt + ' + lClick + 'adicionar cor(es) do layer(s) selecionado(s)',
+			rClick + 'recarregar paleta',
+		].join('\n');
+
+		// var refreshBtn = btnGrp.add('button', undefined, '≡');
+		// var refreshBtn = btnGrp.add('button', undefined, '↺');
+		var refreshBtn = btnGrp.add('button', undefined, '⟲');
+		refreshBtn.minimumSize = [20, 20];
+		refreshBtn.helpTip = 'atualizar paleta';
+		// refreshBtn.enabled = false;
 
 		var swatchesGrp = PAL_w.add('group');
 		swatchesGrp.spacing = 0;
@@ -293,66 +372,38 @@ function PALETTERO_UTL(thisObj) {
 
 			new colorBtn(swatchesGrp, colorArray[c]);
 		}
-		setBgColor(PAL_w, bgColor1); // Cor de fundo da janela
 
-		function PAL_layout() {
-
-			var swatchesCount = swatchesGrp.children.length;
-			var btnWidth = (PAL_w.size.width - 24) / (swatchesCount + 1);
-			var btnHeight = PAL_w.size.height - 16;
-
-			for (var b = 0; b < btnGrp.children.length; b++) {
-
-				var btn = btnGrp.children[b];
-
-				btn.size = [
-					btnWidth,
-					(btnHeight - 4) / 2
-				];
-			}
-			for (var s = 0; s < swatchesCount; s++) {
-
-				var swatch = swatchesGrp.children[s];
-				swatch.text = rgbToHEX(swatch.swatchColor);
-
-				swatch.size = [
-					btnWidth,
-					btnHeight
-				];
-				if ((PAL_w.size.width - 16) / swatchesCount < 50) swatch.text = '';
-				swatch.notify('onDraw');
-			}
-			PAL_w.minimumSize = [(swatchesCount + 1) * 20 + 24, 36];
-			PAL_w.layout.layout(true);
-			PAL_w.layout.resize();
-		}
+		setBgColor(PAL_w, bgColor1);
 
 		addBtn.onClick = function () {
 
 			var aItem = app.project.activeItem;
 			var selLayers = aItem != null ? aItem.selectedLayers : [];
-			var newColorsArray = [];
-
-			if (selLayers.length == 0) new colorBtn(swatchesGrp, new colorPicker());
+			var newColorsArray = loadProjectPalette();
+			var refArray = loadProjectPalette();
 
 			for (var i = 0; i < selLayers.length; i++) {
 
 				var selProps = selLayers[i].selectedProperties;
 
-				if (selProps.length == 0) new colorBtn(swatchesGrp, new colorPicker());
+				if (selProps.length == 0) continue;
 
-				getPropertyColors(selProps[0], newColorsArray);
+				newColorsArray = getPropertyColors(selProps[0], newColorsArray);
 			}
 
-			if (newColorsArray.length == 0) newColorsArray.push([1, 1, 1, 1]);
+			if (selLayers.length == 0 || newColorsArray == refArray) newColorsArray.push('#FFFFFF');
 
 			for (var c = 0; c < newColorsArray.length; c++) {
+
+				// alert(refArray.indexOf(newColorsArray[c]));
+				if (refArray.indexOf(newColorsArray[c]) >= 0) continue;
 
 				try {
 					new colorBtn(swatchesGrp, new colorPicker(newColorsArray[c]));
 				} catch (err) { }
 			}
-			PAL_layout();
+			saveProjectPalette(swatchesGrp);
+			PAL_layout(PAL_w);
 		};
 
 		addBtn.addEventListener('click', function (c) {
@@ -360,7 +411,8 @@ function PALETTERO_UTL(thisObj) {
 
 				var aItem = app.project.activeItem;
 				var selLayers = aItem != null ? aItem.selectedLayers : [];
-				var newColorsArray = [];
+				var refArray = loadProjectPalette();
+				var newColorsArray = loadProjectPalette();
 
 				if (selLayers.length == 0) return;
 
@@ -372,48 +424,52 @@ function PALETTERO_UTL(thisObj) {
 
 					if (selProps.length == 0) {
 
-						// for (var e = 1; e <= effects.numProperties; e++) {
-
-						// 	selProps.push(effects.property(e));
-						// }
-						getPropertyColors(effects, newColorsArray);
+						newColorsArray = getPropertyColors(effects, newColorsArray);
 
 						if (selLayers[i] instanceof ShapeLayer) {
 
 							var contents = selLayers[i].property('ADBE Root Vectors Group');
-							// var shpPropsArray = getNestedProperties(contents, []);
-							getPropertyColors(contents, newColorsArray);
+							newColorsArray = getPropertyColors(contents, newColorsArray);
 						}
-
-						// 	selProps = selProps.concat(shpPropsArray);
-						// 	// alert(selProps.length);
-						// 	// getPropertyColors(contents, newColorsArray);
-						// 	// alert('é shape layer');
-						// 	// for (var e = 1; e <= contents.numProperties; e++) {
-						// 	// 	alert(contents.property(e).name);
-						// 	// 	selProps.push(contents.property(e));
-						// 	// }
-						// }
 					}
 
 					for (var p = 0; p < selProps.length; p++) {
 
-						getPropertyColors(selProps[p], newColorsArray);
+						newColorsArray = getPropertyColors(selProps[p], newColorsArray);
 					}
 				}
 
 				for (var c = 0; c < newColorsArray.length; c++) {
 
+					if (refArray.indexOf(newColorsArray[c]) >= 0) continue;
+
 					try {
 						new colorBtn(swatchesGrp, newColorsArray[c]);
 					} catch (err) { }
 				}
-				PAL_layout();
+				saveProjectPalette(swatchesGrp);
+				PAL_layout(PAL_w);
 			}
 		});
 
+		refreshBtn.onClick = function () {
+
+			while (swatchesGrp.children.length > 0) {
+
+				swatchesGrp.remove(swatchesGrp.children[0]);
+			}
+
+			colorArray = loadProjectPalette();
+
+			for (var c = 0; c < colorArray.length; c++) {
+
+				new colorBtn(swatchesGrp, colorArray[c]);
+			}
+			PAL_layout(PAL_w);
+		};
+
 		PAL_w.onShow = PAL_w.onResizing = PAL_w.onResize = function () {
-			PAL_layout();
+			PAL_layout(PAL_w);
 		};
 
 		return PAL_w;

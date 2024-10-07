@@ -36,3 +36,46 @@ function setXMPData(XMPfield, XMPval) {
 	// Atualiza os metadados do projeto
 	app.project.xmpPacket = metaData.serialize();
 }
+
+// function PAL_registerNamespace() {
+
+
+// }
+
+// function PAL_saveMetadata(key, value) {
+
+// 	// Registrar o namespace
+// 	var namespaceURI = 'http://ns.adobe.com/o_palettero/1.0/';
+// 	var registeredPrefix = XMPMeta.registerNamespace(namespaceURI, 'o_palettero');
+
+// 	// Obter os metadados existentes
+// 	var myXMP = new XMPMeta(app.project.xmpPacket);
+
+// 	// Definir o novo valor de metadados
+// 	myXMP.setProperty(namespaceURI, key, value, XMPConst.STRING);
+
+// 	// Armazenar os metadados atualizados
+// 	var myPacket = myXMP.serialize();
+// 	app.project.xmpPacket = myPacket;
+
+// 	return true;
+// }
+
+// // Exemplo de uso:
+// // PAL_saveMetadata('paleta', '#FFFFFF-#000000-#FF0000-#00FF00-#0000FF-#FFFF00-#FF00FF-#00FFFF');
+
+// function PAL_getMetadata(key) {
+
+//     // Carregar pacote XMP existente
+//     var myXMP = new XMPMeta(app.project.xmpPacket);
+    
+//     // Recuperar o valor
+// 	var namespaceURI = 'http://ns.adobe.com/o_palettero/1.0/';
+//     var myValue = myXMP.getProperty(namespaceURI, key);
+//     return myValue ? myValue.toString() : null;
+// }
+
+// // Exemplo de uso:
+// var paleta = PAL_getMetadata("paleta");
+// alert(paleta); // Deve exibir "#FFFFFF"
+

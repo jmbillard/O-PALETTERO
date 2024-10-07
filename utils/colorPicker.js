@@ -247,7 +247,7 @@
 
 
 			// editor.oc = win.editor.oc = win.add("Group{ok:Button{text:'aplicar'},can:Button{text:'cancelar'},rem:Button{text:'remover'}}");
-			editor.oc = win.editor.oc = win.add("Group{ok:Button{text:'aplicar'},can:Button{text:'cancelar'}}");
+			editor.oc = win.editor.oc = win.add("Group{can:Button{text:'cancelar'},ok:Button{text:'aplicar'}}");
 
 			editor.oc.ok.onClick = function () {
 				win.close();
@@ -271,10 +271,6 @@
 			gfxs.fillPath(gfxs.newBrush(gfxs.BrushType.SOLID_COLOR, targetColour));
 		};
 
-
-
-
-
 		this.updateCursor(win);
 
 		this.setDefaultValue(win)
@@ -294,7 +290,6 @@
 
 		pi.gulu.uni.unicode.text = colorPicker.RgbToHex(startColour);
 		pi.gulu.uni.unicode.active = true;
-
 
 
 		pi.colorHolder.colorCol1.rGroup.rValue.text = Math.round(startColour[0] * 255);
@@ -713,6 +708,7 @@
 	}
 
 	colorPicker.RgbToHsb = function (rgb) {
+
 		rgb = colorPicker.parseColor(rgb);
 		rgb = [rgb[0] * 255, rgb[1] * 255, rgb[2] * 255]
 		var hsb = [];
@@ -723,24 +719,29 @@
 		rearranged.sort(function (a, b) {
 			return a - b;
 		})
+
 		for (var i = 0; i < 3; i++) {
 			if (rearranged[0] == rgb[i]) minIndex = i;
 			if (rearranged[2] == rgb[i]) maxIndex = i;
 		}
+
 		if (rearranged[2] != 0) {
 			hsb[2] = rearranged[2] / 255;
 			hsb[1] = 1 - rearranged[0] / rearranged[2];
 			if (hsb[1] != 0) {
 				hsb[0] = maxIndex * 120 + 60 * (rearranged[1] / hsb[1] / rearranged[2] + (1 - 1 / hsb[1])) * ((maxIndex - minIndex + 3) % 3 == 1 ? 1 : -1);
 				hsb[0] = (hsb[0] + 360) % 360;
+
 			} else {
 				hsb[0] = 0;
 			}
+
 		} else {
 			hsb[2] = 0;
 			hsb[1] = 0;
 			hsb[0] = 0;
 		}
+
 		return [Math.round(hsb[0]), Math.round(hsb[1] * 100), Math.round(hsb[2] * 100)];
 	}
 
@@ -775,7 +776,6 @@
 		}
 
 		return [h, s, b];
-
 	}
 
 	colorPicker.isType = function (content, type) {
@@ -828,7 +828,6 @@
 		if (hexStr.length != 6)
 			return false;
 
-
 		var arr = ["0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "A", "B", "C", "D", "E", "F"];
 		var isHex = true;
 		hexStr = hexStr.toUpperCase();
@@ -848,7 +847,6 @@
 
 		if (!colorPicker.isType(hexStr, "String"))
 			return false;
-
 
 		if (hexStr.length != 3)
 			return false;
@@ -978,8 +976,8 @@
 			this.settingFile.close();
 			return isOk;
 		}
-
 	}
+
 	$.global.colorPicker = colorPicker;
 	return colorPicker;
 })();
