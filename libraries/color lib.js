@@ -126,3 +126,73 @@ function rgbToHsb(rgbArray) {
 	}
 	return [Math.round(hsbArray[0]), Math.round(hsbArray[1] * 100), Math.round(hsbArray[2] * 100)];
 }
+
+function hexToHsl(hex) {
+	var r = parseInt(hex.slice(1, 3), 16) / 255;
+	var g = parseInt(hex.slice(3, 5), 16) / 255;
+	var b = parseInt(hex.slice(5, 7), 16) / 255;
+
+	var max = Math.max(r, g, b);
+	var min = Math.min(r, g, b);
+	var h, s, l = (max + min) / 2;
+
+	if (max === min) {
+		h = s = 0; // achromatic
+	} else {
+		var d = max - min;
+		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+		switch (max) {
+			case r: h = (g - b) / d + (g < b ? 6 : 0); break;
+			case g: h = (b - r) / d + 2; break;
+			case b: h = (r - g) / d + 4; break;
+		}
+		h /= 6;
+	}
+
+	return [h, s, l];
+}
+
+function sortHex(colorArray) {
+
+	return colorArray.sort(function (a, b) {
+		var hslA = hexToHsl(a);
+		var hslB = hexToHsl(b);
+
+		if (Math.abs(hslA[0] - hslB[0]) < 0.25) {
+			return hslA[0] - hslB[0];
+		} else {
+			return hslA[2] - hslB[2];
+		}
+	});
+}
+
+// Calcular a luminância relativa
+function luminance(r, g, b) {
+	r = r / 255;
+	g = g / 255;
+	b = b / 255;
+	r = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
+	g = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
+	b = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+	return r * 0.2126 + g * 0.7152 + b * 0.0722;
+}
+
+function isLightColor(bgColor) {
+
+	var rgb = hexToRGB(bgColor) * 255;
+	var bgLum = luminance(rgb.r, rgb.g, rgb.b);
+
+	// Luminância de branco (#FFFFFF) e preto (#000000)
+	var whiteLum = luminance(255, 255, 255);
+	var blackLum = luminance(0, 0, 0);
+
+	// Razão de contraste (o mais alto é melhor)
+	var contrastWithWhite = (whiteLum + 0.05) / (bgLum + 0.05);
+	var contrastWithBlack = (bgLum + 0.05) / (blackLum + 0.05);
+
+	// Verificar se o contraste com branco é suficiente
+	var isWhiteLegible = contrastWithWhite >= 4.5;
+	var isBlackLegible = contrastWithBlack >= 4.5;
+
+	return isWhiteLegible ? true : !isBlackLegible;
+}
