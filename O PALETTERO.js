@@ -74,7 +74,8 @@ function O_PALETTERO_UTL(thisObj) {
 
 		for (var s = 0; s < swatchesCount; s++) {
 
-			var swatch = sectionGrp.children[s];
+			var colorGrp = sectionGrp.children[s];
+			var swatch = colorGrp.children[0];
 			var tempHEX = rgbToHEX(swatch.swatchColor);
 
 			tempSwatchesArray.push(tempHEX);
@@ -96,7 +97,6 @@ function O_PALETTERO_UTL(thisObj) {
 		} catch (err) {
 			alert(lol + '#PAL_01 - ' + err.message);
 		}
-
 		app.project.xmpPacket = mData.serialize();
 	}
 
@@ -107,11 +107,17 @@ function O_PALETTERO_UTL(thisObj) {
 		var propName = "xmp:Label";
 
 		var swatchesArray = [
-			'#05A6FF',
-			'#80D2FF',
-			'#8800f8',
-			'#8640BF',
-			'#004266'
+			'#F13333',
+			'#FF4D4D',
+			'#FE674C',
+			'#FF8F4D',
+			'#FFC44E',
+			'#FF5A68',
+			'#FF739A',
+			'#FF8CCD',
+			'#B5ADFF',
+			'#80C0FE',
+			'#5DE6A2',
 		];
 
 		try {
@@ -125,16 +131,42 @@ function O_PALETTERO_UTL(thisObj) {
 		return swatchesArray;
 	}
 
+	function buildColorGrp(colorGrp, color) {
+
+		var tempArray = [
+			// {
+			// 	color: secColor(color, 1.2),
+			// 	secSwatch: true
+			// },
+			{
+				color: color
+			}
+			// {
+			// 	color: secColor(color, 0.8),
+			// 	secSwatch: true
+			// }
+		];
+
+		for (var c = 0; c < tempArray.length; c++) {
+			new colorSwatch(colorGrp, tempArray[c]);
+		}
+	};
+
 	function buildPalette(sectionGrp) {
 
 		var swatchesArray = loadProjectPalette();
 
 		for (var s = 0; s < swatchesArray.length; s++) {
 
-			new colorBtn(sectionGrp, swatchesArray[s]);
+			var colorGrp = sectionGrp.add('group');
+			colorGrp.orientation = 'column';
+			colorGrp.spacing = 0;
+
+			var rgbArray = hexToRGB(swatchesArray[s]);
+
+			buildColorGrp(colorGrp, swatchesArray[s]);
 		}
 	}
-
 
 	function sortPalette(sectionGrp) {
 
@@ -144,7 +176,13 @@ function O_PALETTERO_UTL(thisObj) {
 
 		for (var s = 0; s < swatchesArray.length; s++) {
 
-			new colorBtn(sectionGrp, swatchesArray[s]);
+			var colorGrp = sectionGrp.add('group');
+			colorGrp.orientation = 'column';
+			colorGrp.spacing = 0;
+
+			var rgbArray = hexToRGB(swatchesArray[s]);
+
+			buildColorGrp(colorGrp, swatchesArray[s]);
 		}
 	}
 
@@ -157,17 +195,17 @@ function O_PALETTERO_UTL(thisObj) {
 		var isRow = w > h;
 		var edge = isRow ? w : h * 1.8;
 
-		var swatchesGrp = win.children[1];
 		var btnGrp1 = win.children[0];
+		var swatchesGrp = win.children[1];
 		var btnGrp2 = win.children[2];
 
 		var grpOrientation = isRow ? 'row' : 'column';
 		var btnOrientation = isRow ? 'column' : 'row';
 		var btnAlignment = isRow ? ['center', 'top'] : 'center';
-		
+
 		btnCount = Math.max(btnGrp1.children.length, btnGrp2.children.length);
-		btnMaxWidth = isRow ? 64 : btnCount * 32;
-		btnMaxHeight = isRow ? btnCount * 32 : 64;
+		btnGrpWidth = isRow ? 64 : btnCount * 32;
+		btnGrpHeight = isRow ? btnCount * 32 : 64;
 
 		win.orientation = grpOrientation;
 		swatchesGrp.orientation = grpOrientation;
@@ -177,31 +215,49 @@ function O_PALETTERO_UTL(thisObj) {
 		btnGrp2.alignment = btnAlignment;
 
 		var swatchesCount = swatchesGrp.children.length;
-		var swatchWidth = isRow ? (w - btnMaxWidth) / swatchesCount : w;
-		var swatchHeight = isRow ? h : (h - btnMaxHeight) / swatchesCount;
+
+		var mainSwatchWidth = isRow ? (w - btnGrpWidth) / swatchesCount : w;
+		var mainSwatchHeight = isRow ? h : (h - btnGrpHeight) / swatchesCount;
+
+		// var secSwatchWidth = isRow ? mainSwatchWidth : 20;
+		// var secSwatchHeight = isRow ? 20 : mainSwatchHeight;
 
 		for (var s = 0; s < swatchesCount; s++) {
 
-			var swatch = swatchesGrp.children[s];
-			swatch.text = rgbToHEX(swatch.swatchColor);
+			var colorGrp = swatchesGrp.children[s];
+			colorGrp.orientation = btnOrientation;
 
-			swatch.minimumSize = isRow ? [20, btnMaxHeight] : [btnMaxWidth, 20];
-			swatch.size = [
-				swatchWidth,
-				swatchHeight
-			];
-			if ((edge - 64) / swatchesCount < 60) swatch.text = '';
+			// var swatch0 = colorGrp.children[0];
+			var swatch1 = colorGrp.children[0];
+			// var swatch2 = colorGrp.children[2];
+
+			// swatch0.text = '';
+			swatch1.text = rgbToHEX(swatch1.swatchColor);
+			// swatch2.text = '';
+
+			// swatch0.minimumSize = isRow ? [20, 20] : [20, 20];
+			swatch1.minimumSize = isRow ? [20, btnGrpHeight] : [btnGrpWidth, 20];
+			// swatch2.minimumSize = isRow ? [20, 20] : [20, 20];
+
+			// swatch0.size = [secSwatchWidth, secSwatchHeight];
+			swatch1.size = [mainSwatchWidth, mainSwatchHeight];
+			// swatch2.size = [secSwatchWidth, secSwatchHeight];
+
+			if ((edge - 64) / swatchesCount < 60) swatch1.text = '';
+			colorGrp.layout.layout(true);
+			swatchesGrp.layout.layout(true);
 		}
-		win.minimumSize = isRow ? [swatchesCount * 20 + btnMaxWidth, btnMaxHeight] : [btnMaxWidth, swatchesCount * 20 + btnMaxHeight];
+		win.minimumSize = isRow ? [swatchesCount * 20 + btnGrpWidth, btnGrpHeight] : [btnGrpWidth, swatchesCount * 20 + btnGrpHeight];
 		win.layout.layout(true);
 		win.layout.resize();
 	}
 
 	// ---------------------------------------------------------------------------------
 
-	function colorBtn(sectionGrp, color) {
+	function colorSwatch(sectionGrp, swatchProperties) {
 
 		var newUiCtrlObj = {};
+		var color = swatchProperties.color;
 
 		var isHEX = color.toString().match(/^#/);
 		var hexCode = isHEX ? color : rgbToHEX(color);
@@ -210,25 +266,32 @@ function O_PALETTERO_UTL(thisObj) {
 		newUiCtrlObj.swatch = sectionGrp.add('customButton');
 		newUiCtrlObj.swatch.text = hexCode;
 		newUiCtrlObj.swatch.swatchColor = rgbArray;
+		
+		if (swatchProperties.secSwatch == undefined) swatchProperties.secSwatch = false;
+		newUiCtrlObj.swatch.secSwatch = swatchProperties.secSwatch;
 
-		newUiCtrlObj.swatch.helpTip = [
-			'HEX: ' + hexCode,
-			'RGB: ' + rgbToRGB(rgbArray).join(', '),
-			'',
-			lClick + 'aplicar fill',
-			rClick + 'editar cor',
-			'',
-			'Alt + ' + rClick + 'excluir cor'
-		].join('\n');
+		// newUiCtrlObj.swatch.helpTip = [
+		// 	'HEX: ' + hexCode,
+		// 	'RGB: ' + rgbToRGB(rgbArray).join(', '),
+		// 	'',
+		// 	lClick + 'aplicar fill'
+		// ].join('\n');
 
-		drawColorButton(newUiCtrlObj.swatch, false);
+		// if (!swatchProperties.secSwatch) newUiCtrlObj.swatch.helpTip += [
+		// 	'',
+		// 	rClick + 'editar cor',
+		// 	'',
+		// 	'Alt + ' + rClick + 'excluir cor'
+		// ].join('\n');
+
+		drawColorSwatch(newUiCtrlObj.swatch, false);
 
 		newUiCtrlObj.swatch.addEventListener('mouseover', function () {
-			drawColorButton(this, true);
+			drawColorSwatch(this, true);
 		});
 
 		newUiCtrlObj.swatch.addEventListener('mouseout', function () {
-			drawColorButton(this, false);
+			drawColorSwatch(this, false);
 		});
 
 		newUiCtrlObj.swatch.onClick = function () {
@@ -250,36 +313,47 @@ function O_PALETTERO_UTL(thisObj) {
 
 		newUiCtrlObj.swatch.addEventListener('click', function (c) {
 
+			if (this.secSwatch) return;
+
+			var colorGrp = this.parent;
+			var swatchesGrp = colorGrp.parent;
+			var win = swatchesGrp.parent;
 			if (c.button == 2) {
 
 				if (ScriptUI.environment.keyboardState.altKey) {
 
-					var pGrp = this.parent;
-					var win = pGrp.parent;
-					var bGrp = win.children[0];
-					pGrp.remove(this);
+					swatchesGrp.remove(colorGrp);
 
-					saveProjectPalette(sectionGrp);
+					saveProjectPalette(swatchesGrp);
 					PAL_layout(win);
 
 					return;
 				}
 
 				try {
-					this.swatchColor = colorPicker(this.swatchColor);
-					this.text = rgbToHEX(this.swatchColor);
-					this.helpTip = [
-						'HEX: ' + hexCode,
-						'RGB: ' + rgbToRGB(rgbArray).join(', '),
-						'',
-						lClick + 'aplicar fill',
-						rClick + 'editar cor',
-						'',
-						'Alt + ' + lClick + 'excluir cor'
-					].join('\n');
+					// var swatch0 = this.parent.children[0];
+					// var swatch2 = this.parent.children[2];
 
-					drawColorButton(this, false);
-					saveProjectPalette(sectionGrp);
+					this.swatchColor = new colorPicker(this.swatchColor);
+					// swatch0.swatchColor = hexToRGB(secColor(this.swatchColor, 1.2));
+					// swatch2.swatchColor = hexToRGB(secColor(this.swatchColor, 0.8));
+
+					this.text = rgbToHEX(this.swatchColor);
+					// this.helpTip = [
+					// 	'HEX: ' + hexCode,
+					// 	'RGB: ' + rgbToRGB(rgbArray).join(', '),
+					// 	'',
+					// 	lClick + 'aplicar fill',
+					// 	rClick + 'editar cor',
+					// 	'',
+					// 	'Alt + ' + lClick + 'excluir cor'
+					// ].join('\n');
+
+					drawColorSwatch(this, false);
+					// drawColorSwatch(swatch0, false);
+					// drawColorSwatch(swatch2, false);
+
+					saveProjectPalette(swatchesGrp);
 
 				} catch (err) { }
 			}
@@ -288,7 +362,7 @@ function O_PALETTERO_UTL(thisObj) {
 		return newUiCtrlObj;
 	}
 
-	function drawColorButton(button, hover) {
+	function drawColorSwatch(button, hover) {
 
 		var isDark = rgbToHsb(button.swatchColor)[2] < 85;
 
@@ -312,7 +386,7 @@ function O_PALETTERO_UTL(thisObj) {
 			g.fillPath(fillBrush);
 			g.strokePath(pathPen);
 
-			g.drawString(this.text, textPen, 10, 0);
+			if (!this.secSwatch) g.drawString(this.text, textPen, 10, 0);
 		};
 	}
 
@@ -405,7 +479,7 @@ function O_PALETTERO_UTL(thisObj) {
 		addBtn.justify = 'center';
 		addBtn.helpTip = [
 			lClick + 'adicionar uma nova cor',
-			rClick + 'adicionar cor(es) do layer(s) selecionado(s)',
+			rClick + 'adicionar todas as cores dos layers selecionados',
 		].join('\n');
 		setCtrlHighlight(addBtn, normalColor1, highlightColor1);
 
@@ -478,16 +552,31 @@ function O_PALETTERO_UTL(thisObj) {
 				}
 			}
 
-			if (newColorsArray.length == refArray.length) new colorBtn(swatchesGrp, new colorPicker());
-
 			if (newColorsArray.length > refArray.length) {
 
 				for (var c = 0; c < newColorsArray.length; c++) {
 
 					if (refArray.indexOf(newColorsArray[c]) >= 0) continue;
 
-					new colorBtn(swatchesGrp, newColorsArray[c]);
+					var colorGrp = swatchesGrp.add('group');
+					colorGrp.orientation = 'column';
+					colorGrp.spacing = 0;
+		
+					buildColorGrp(colorGrp, newColorsArray[c]);
 				}
+			}
+
+			if (newColorsArray.length == refArray.length) {
+				try {
+					var tempHex = rgbToHEX(new colorPicker());
+
+					var colorGrp = swatchesGrp.add('group');
+					colorGrp.orientation = 'column';
+					colorGrp.spacing = 0;
+		
+					buildColorGrp(colorGrp, tempHex);
+	
+				} catch (err) { }
 			}
 			saveProjectPalette(swatchesGrp);
 			PAL_layout(PAL_w);

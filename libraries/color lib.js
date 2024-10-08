@@ -196,3 +196,19 @@ function isLightColor(bgColor) {
 
 	return isWhiteLegible ? true : !isBlackLegible;
 }
+
+function secColor(color, factor) {
+
+	var isHEX = color.toString().match(/^#/);
+	var hexCode = isHEX ? color : rgbToHEX(color);
+	var rgbArray = isHEX ? hexToRGB(color) : color;
+	var hsbArray = rgbToHsb(rgbArray);
+
+	if (hsbArray[2] == 100 && factor > 1) hsbArray[1] *= 0.9;
+
+	hsbArray[2] = Math.min(hsbArray[2] * factor, 100);
+
+	var secRGBArray = hsbToRgb(hsbArray) / 255;
+
+	return rgbToHEX(secRGBArray);
+}
