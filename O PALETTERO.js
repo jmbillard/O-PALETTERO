@@ -560,6 +560,19 @@ function O_PALETTERO_UTL(thisObj) {
 					if (selLayers[i] instanceof TextLayer) {
 
 						var text = selLayers[i].property('ADBE Text Properties');
+						var textDoc = text.property('ADBE Text Document').value;
+
+						if (textDoc.applyFill) {
+
+							var tempHex = rgbToHEX(textDoc.fillColor);
+							if (newColorsArray.indexOf(tempHex) < 0) newColorsArray.push(tempHex);
+						}
+						if (textDoc.applyStroke) {
+
+							var tempHex = rgbToHEX(textDoc.strokeColor);
+							if (newColorsArray.indexOf(tempHex) < 0) newColorsArray.push(tempHex);
+						}
+
 						newColorsArray = getPropertyColors(text, newColorsArray);
 					}
 				}
