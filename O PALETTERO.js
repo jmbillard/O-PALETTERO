@@ -366,7 +366,7 @@ function O_PALETTERO_UTL(thisObj) {
 
 	function drawColorSwatch(button, hover) {
 
-		var isDark = rgbToHsb(button.swatchColor)[2] < 85;
+		var isDark = luminance(button.swatchColor) < 0.4;
 
 		var textColor = isDark ? [1, 1, 1, 0.5] : [0, 0, 0, 0.5];
 

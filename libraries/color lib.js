@@ -141,23 +141,41 @@ function hexToHsl(hex) {
 
 function sortHex(colorArray) {
 
-	return colorArray.sort(function (a, b) {
-		var hslA = hexToHsl(a);
-		var hslB = hexToHsl(b);
+	var cArray = [];
+	var gArray = [];
 
-		if (hslA[0] != hslB[0]) {
+	for (var c = 0; c < colorArray.length; c++) {
 
-			return hslA[0] - hslB[0];
+		var tempHsl = hexToHsl(colorArray[c]);
 
-		} else if (hslA[2] != hslB[2]) {
-
-			return hslA[2] - hslB[2];
-
-		} else {
-
-			return hslA[1] - hslB[1];
+		if (tempHsl[1] < 0.15) {
+			gArray.push(colorArray[c]);
+			continue;
 		}
-	});
+		cArray.push(colorArray[c]);
+	}
+
+	function compare(array) {
+		return array.sort(function (a, b) {
+			var hslA = hexToHsl(a);
+			var hslB = hexToHsl(b);
+
+			if (hslA[0] != hslB[0]) {
+
+				return hslA[0] - hslB[0];
+
+			} else if (hslA[2] != hslB[2]) {
+
+				return hslA[2] - hslB[2];
+
+			} else {
+
+				return hslA[1] - hslB[1];
+			}
+		});
+	}
+
+	return compare(cArray).concat(compare(gArray));
 }
 
 // Calcular a luminância relativa
