@@ -8,7 +8,7 @@
 
 */
 // Converte uma string hexadecimal (com ou sem '#') para um array RGB normalizado.
-function hexToRGB(hex) {
+function hexToRgb(hex) {
 	if (hex == undefined) return [Math.random(), Math.random(), Math.random()];
 
 	// Remove o '#' se estiver presente
@@ -56,22 +56,6 @@ function rgbToRGB(rgbArray) {
 	return RGBArray;
 }
 
-// function rgbToHEX(rgbArray) {
-// 	var a = (rgbArray[0] * 255).toString(16);
-// 	var b = (rgbArray[1] * 255).toString(16);
-// 	var c = (rgbArray[2] * 255).toString(16);
-// 	if (a.length != 2) {
-// 		a = "0" + a;
-// 	}
-// 	if (b.length != 2) {
-// 		b = "0" + b;
-// 	}
-// 	if (c.length != 2) {
-// 		c = "0" + c;
-// 	}
-// 	return ('#' + a + b + c).toUpperCase();
-// }
-
 function hsbToRgb(hsbArray) {
 
 	var rgbArray = [];
@@ -113,9 +97,11 @@ function rgbToHsb(rgbArray) {
 	if (rearranged[2] != 0) {
 		hsbArray[2] = rearranged[2] / 255;
 		hsbArray[1] = 1 - rearranged[0] / rearranged[2];
+
 		if (hsbArray[1] != 0) {
 			hsbArray[0] = maxIndex * 120 + 60 * (rearranged[1] / hsbArray[1] / rearranged[2] + (1 - 1 / hsbArray[1])) * ((maxIndex - minIndex + 3) % 3 == 1 ? 1 : -1);
 			hsbArray[0] = (hsbArray[0] + 360) % 360;
+
 		} else {
 			hsbArray[0] = 0;
 		}
@@ -137,7 +123,8 @@ function hexToHsl(hex) {
 	var h, s, l = (max + min) / 2;
 
 	if (max === min) {
-		h = s = 0; // achromatic
+		h = s = 0;
+
 	} else {
 		var d = max - min;
 		s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
@@ -158,50 +145,39 @@ function sortHex(colorArray) {
 		var hslA = hexToHsl(a);
 		var hslB = hexToHsl(b);
 
-		if (Math.abs(hslA[0] - hslB[0]) < 0.25) {
+		if (hslA[0] != hslB[0]) {
+
 			return hslA[0] - hslB[0];
-		} else {
+
+		} else if (hslA[2] != hslB[2]) {
+
 			return hslA[2] - hslB[2];
+
+		} else {
+
+			return hslA[1] - hslB[1];
 		}
 	});
 }
 
 // Calcular a luminância relativa
-function luminance(r, g, b) {
-	r = r / 255;
-	g = g / 255;
-	b = b / 255;
+function luminance(rgbArray) {
+	var r = rgbArray[0];
+	var g = rgbArray[1];
+	var b = rgbArray[2];
+
 	r = r <= 0.03928 ? r / 12.92 : Math.pow((r + 0.055) / 1.055, 2.4);
 	g = g <= 0.03928 ? g / 12.92 : Math.pow((g + 0.055) / 1.055, 2.4);
 	b = b <= 0.03928 ? b / 12.92 : Math.pow((b + 0.055) / 1.055, 2.4);
+
 	return r * 0.2126 + g * 0.7152 + b * 0.0722;
-}
-
-function isLightColor(bgColor) {
-
-	var rgb = hexToRGB(bgColor) * 255;
-	var bgLum = luminance(rgb.r, rgb.g, rgb.b);
-
-	// Luminância de branco (#FFFFFF) e preto (#000000)
-	var whiteLum = luminance(255, 255, 255);
-	var blackLum = luminance(0, 0, 0);
-
-	// Razão de contraste (o mais alto é melhor)
-	var contrastWithWhite = (whiteLum + 0.05) / (bgLum + 0.05);
-	var contrastWithBlack = (bgLum + 0.05) / (blackLum + 0.05);
-
-	// Verificar se o contraste com branco é suficiente
-	var isWhiteLegible = contrastWithWhite >= 4.5;
-	var isBlackLegible = contrastWithBlack >= 4.5;
-
-	return isWhiteLegible ? true : !isBlackLegible;
 }
 
 function secColor(color, factor) {
 
 	var isHEX = color.toString().match(/^#/);
 	var hexCode = isHEX ? color : rgbToHEX(color);
-	var rgbArray = isHEX ? hexToRGB(color) : color;
+	var rgbArray = isHEX ? hexToRgb(color) : color;
 	var hsbArray = rgbToHsb(rgbArray);
 
 	if (hsbArray[2] == 100 && factor > 1) hsbArray[1] *= 0.9;

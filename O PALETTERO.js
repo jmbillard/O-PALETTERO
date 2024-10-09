@@ -112,12 +112,12 @@ function O_PALETTERO_UTL(thisObj) {
 			'#FE674C',
 			'#FF8F4D',
 			'#FFC44E',
-			'#FF5A68',
-			'#FF739A',
-			'#FF8CCD',
-			'#B5ADFF',
-			'#80C0FE',
 			'#5DE6A2',
+			'#80C0FE',
+			'#B5ADFF',
+			'#FF8CCD',
+			'#FF739A',
+			'#FF5A68',
 		];
 
 		try {
@@ -154,36 +154,38 @@ function O_PALETTERO_UTL(thisObj) {
 
 	function buildPalette(sectionGrp) {
 
-		var swatchesArray = loadProjectPalette();
+		var tempSwatchesArray = loadProjectPalette();
 
-		for (var s = 0; s < swatchesArray.length; s++) {
+		for (var s = 0; s < tempSwatchesArray.length; s++) {
 
 			var colorGrp = sectionGrp.add('group');
 			colorGrp.orientation = 'column';
 			colorGrp.spacing = 0;
 
-			var rgbArray = hexToRGB(swatchesArray[s]);
-
-			buildColorGrp(colorGrp, swatchesArray[s]);
+			buildColorGrp(colorGrp, tempSwatchesArray[s]);
 		}
 	}
 
-	function sortPalette(sectionGrp) {
+	function sortPalette() {
 
-		var swatchesArray = loadProjectPalette();
+		var tempSwatchesArray = sortHex(loadProjectPalette());
 
-		swatchesArray = sortHex(swatchesArray);
+		var mData = new XMPMeta(app.project.xmpPacket);
+		var schemaNS = XMPMeta.getNamespaceURI("xmp");
+		var propName = "xmp:Label";
 
-		for (var s = 0; s < swatchesArray.length; s++) {
+		try {
+			if (tempSwatchesArray.length > 0) {
+				mData.setProperty(schemaNS, propName, tempSwatchesArray.join('-'));
 
-			var colorGrp = sectionGrp.add('group');
-			colorGrp.orientation = 'column';
-			colorGrp.spacing = 0;
+			} else {
+				mData.deleteProperty(schemaNS, propName);
+			}
 
-			var rgbArray = hexToRGB(swatchesArray[s]);
-
-			buildColorGrp(colorGrp, swatchesArray[s]);
+		} catch (err) {
+			alert(lol + '#PAL_02 - ' + err.message);
 		}
+		app.project.xmpPacket = mData.serialize();
 	}
 
 	// ---------------------------------------------------------------------------------
@@ -261,12 +263,12 @@ function O_PALETTERO_UTL(thisObj) {
 
 		var isHEX = color.toString().match(/^#/);
 		var hexCode = isHEX ? color : rgbToHEX(color);
-		var rgbArray = isHEX ? hexToRGB(color) : color;
+		var rgbArray = isHEX ? hexToRgb(color) : color;
 
 		newUiCtrlObj.swatch = sectionGrp.add('customButton');
 		newUiCtrlObj.swatch.text = hexCode;
 		newUiCtrlObj.swatch.swatchColor = rgbArray;
-		
+
 		if (swatchProperties.secSwatch == undefined) swatchProperties.secSwatch = false;
 		newUiCtrlObj.swatch.secSwatch = swatchProperties.secSwatch;
 
@@ -335,8 +337,8 @@ function O_PALETTERO_UTL(thisObj) {
 					// var swatch2 = this.parent.children[2];
 
 					this.swatchColor = new colorPicker(this.swatchColor);
-					// swatch0.swatchColor = hexToRGB(secColor(this.swatchColor, 1.2));
-					// swatch2.swatchColor = hexToRGB(secColor(this.swatchColor, 0.8));
+					// swatch0.swatchColor = hexToRgb(secColor(this.swatchColor, 1.2));
+					// swatch2.swatchColor = hexToRgb(secColor(this.swatchColor, 0.8));
 
 					this.text = rgbToHEX(this.swatchColor);
 					// this.helpTip = [
@@ -379,7 +381,7 @@ function O_PALETTERO_UTL(thisObj) {
 			var h = this.size.height;
 			var w = this.size.width;
 
-			if (hover) pathPen = g.newPen(g.PenType.SOLID_COLOR, hexToRGB(normalColor1), 2);
+			if (hover) pathPen = g.newPen(g.PenType.SOLID_COLOR, hexToRgb(normalColor1), 2);
 
 			g.newPath();
 			g.rectPath(0, 0, w, h);
@@ -393,7 +395,7 @@ function O_PALETTERO_UTL(thisObj) {
 	// ---------------------------------------------------------------------------------
 
 	function setFgColor(ctrl, hex) {
-		var color = hexToRGB(hex);
+		var color = hexToRgb(hex);
 		var pType = ctrl.graphics.PenType.SOLID_COLOR;
 		ctrl.graphics.foregroundColor = ctrl.graphics.newPen(pType, color, 1);
 	}
@@ -414,7 +416,7 @@ function O_PALETTERO_UTL(thisObj) {
 	// Altera a cor de fundo da janela.
 	function setBgColor(w, hex) {
 
-		var color = hexToRGB(hex);
+		var color = hexToRgb(hex);
 		var bType = w.graphics.BrushType.SOLID_COLOR;
 		w.graphics.backgroundColor = w.graphics.newBrush(bType, color);
 	}
@@ -423,11 +425,18 @@ function O_PALETTERO_UTL(thisObj) {
 
 	function getPropertyColors(property, array) {
 
+		var excludeArray = [
+			'ADBE Material Options Group',
+			'ADBE Plane Options Group',
+			'ADBE Vector Materials Group'
+		];
+
 		for (var i = 1; i <= property.numProperties; i++) {
 
-			if (!property.property(i).isModified) continue;
-
 			var prop = property.property(i);
+
+			if (excludeArray.indexOf(prop.matchName) >= 0) continue;
+			if (!prop.enabled) continue;
 
 			if (prop.numProperties > 0) {
 				getPropertyColors(prop, array);
@@ -440,7 +449,9 @@ function O_PALETTERO_UTL(thisObj) {
 						var refHEX = rgbToHEX(prop.value);
 
 						if (array.indexOf(refHEX) >= 0) continue;
-
+						if (refHEX == '#FF0000' && !prop.isModified) continue;
+						
+						// alert(prop.name + ': ' + prop.parentProperty.matchName);
 						array.push(refHEX);
 					}
 				} catch (err) { }
@@ -483,16 +494,13 @@ function O_PALETTERO_UTL(thisObj) {
 		].join('\n');
 		setCtrlHighlight(addBtn, normalColor1, highlightColor1);
 
-		var sortBtn = btnGrp1.add('statictext', undefined, '⇆');
-		sortBtn.justify = 'center';
-		sortBtn.preferredSize = [32, 24];
-		sortBtn.helpTip = lClick + 'reordenar paleta';
-		setCtrlHighlight(sortBtn, normalColor1, highlightColor1);
-
 		var refreshBtn = btnGrp1.add('statictext', undefined, '⟲');
 		refreshBtn.justify = 'center';
 		refreshBtn.preferredSize = [32, 32];
-		refreshBtn.helpTip = lClick + 'atualizar paleta';
+		refreshBtn.helpTip = [
+			lClick + 'atualizar paleta',
+			rClick + 'ordenar paleta'
+		].join('\n');
 		setCtrlHighlight(refreshBtn, normalColor1, highlightColor1);
 
 		var swatchesGrp = PAL_w.add('group');
@@ -549,6 +557,11 @@ function O_PALETTERO_UTL(thisObj) {
 						var contents = selLayers[i].property('ADBE Root Vectors Group');
 						newColorsArray = getPropertyColors(contents, newColorsArray);
 					}
+					if (selLayers[i] instanceof TextLayer) {
+
+						var text = selLayers[i].property('ADBE Text Properties');
+						newColorsArray = getPropertyColors(text, newColorsArray);
+					}
 				}
 			}
 
@@ -561,7 +574,7 @@ function O_PALETTERO_UTL(thisObj) {
 					var colorGrp = swatchesGrp.add('group');
 					colorGrp.orientation = 'column';
 					colorGrp.spacing = 0;
-		
+
 					buildColorGrp(colorGrp, newColorsArray[c]);
 				}
 			}
@@ -573,9 +586,9 @@ function O_PALETTERO_UTL(thisObj) {
 					var colorGrp = swatchesGrp.add('group');
 					colorGrp.orientation = 'column';
 					colorGrp.spacing = 0;
-		
+
 					buildColorGrp(colorGrp, tempHex);
-	
+
 				} catch (err) { }
 			}
 			saveProjectPalette(swatchesGrp);
@@ -585,32 +598,33 @@ function O_PALETTERO_UTL(thisObj) {
 		// ---------------------------------------------------------------------------------
 
 		refreshBtn.addEventListener('click', function (c) {
-			if (c.button == 0) {
 
-				while (swatchesGrp.children.length > 0) {
+			while (swatchesGrp.children.length > 0) {
 
-					swatchesGrp.remove(swatchesGrp.children[0]);
-				}
-				buildPalette(swatchesGrp);
-				PAL_layout(PAL_w);
+				swatchesGrp.remove(swatchesGrp.children[0]);
 			}
+
+			if (c.button == 2) sortPalette();
+
+			buildPalette(swatchesGrp);
+			PAL_layout(PAL_w);
 		});
 
 		// ---------------------------------------------------------------------------------
 
-		sortBtn.addEventListener('click', function (c) {
+		// sortBtn.addEventListener('click', function (c) {
 
-			if (c.button == 0) {
+		// 	if (c.button == 0) {
 
-				while (swatchesGrp.children.length > 0) {
+		// 		while (swatchesGrp.children.length > 0) {
 
-					swatchesGrp.remove(swatchesGrp.children[0]);
-				}
-				sortPalette(swatchesGrp);
-				saveProjectPalette(swatchesGrp);
-				PAL_layout(PAL_w);
-			}
-		});
+		// 			swatchesGrp.remove(swatchesGrp.children[0]);
+		// 		}
+		// 		sortPalette(swatchesGrp);
+		// 		saveProjectPalette(swatchesGrp);
+		// 		PAL_layout(PAL_w);
+		// 	}
+		// });
 
 		// ---------------------------------------------------------------------------------
 
