@@ -7,6 +7,7 @@ function O_PALETTERO_UTL(thisObj) {
 	var scriptVersion = 'v0.1b';
 
 	#include 'utils/colorPicker.js';
+	#include 'utils/prefs ui.js';
 	#include 'libraries/color lib.js';
 	#include 'libraries/metadata lib.js';
 
@@ -31,6 +32,112 @@ function O_PALETTERO_UTL(thisObj) {
 	var normalColor2 = '#80D2FF';
 	var highlightColor1 = '#8800f8';
 	var highlightColor2 = '#8640BF';
+
+	// Caminhos para as preferências do script e pasta temporária
+	var scriptPreferencesPath = Folder.userData.fullName + '/O PALETTERO script';
+	var scriptPreferencesFolder = new Folder(scriptPreferencesPath);
+	if (!scriptPreferencesFolder.exists) scriptPreferencesFolder.create();
+
+	// Define os valores padrão das preferências do usuário.
+	var PAL_defaultPreferencesObj = {
+		swatches: [
+			'#F13333',
+			'#FF4D4D',
+			'#FE674C',
+			'#FF8F4D',
+			'#FFC44E',
+			'#5DE6A2',
+			'#80C0FE',
+			'#B5ADFF',
+			'#FF8CCD',
+			'#FF739A',
+			'#FF5A68',
+		],
+
+		showLabels: true,
+		labelType: '#HEX'
+	};
+
+	// Chama a função para carregar as preferências ao iniciar o script
+	var PAL_preferencesObj = loadDefaultPreferences();
+	var showLabels = PAL_preferencesObj.showLabels;
+	var labelType = PAL_preferencesObj.labelType;
+
+	function loadDefaultPreferences() {
+		// Tenta carregar o arquivo de preferências
+		var JSONPreferencesFile = new File(scriptPreferencesPath + '/preferences.json');
+		var tempPreferencesObj = {};
+
+		// Se o arquivo existir, tenta ler seu conteúdo
+		if (JSONPreferencesFile.exists) {
+			var JSONContent = readFileContent(JSONPreferencesFile); // Lê o conteúdo do arquivo JSON
+
+			try {
+				tempPreferencesObj = JSON.parse(JSONContent); // Converte o conteúdo JSON para um objeto JavaScript
+
+			} catch (err) {
+				// Exibe um alerta se houver erro ao carregar o JSON
+				alert('Falha ao carregar as preferências... ' + lol + '\n' + err.message);
+			}
+		}
+
+		// Preenche as preferências com os valores padrão, caso não existam
+		for (var o in PAL_defaultPreferencesObj) {
+			if (!tempPreferencesObj.hasOwnProperty(o)) {
+				tempPreferencesObj[o] = PAL_defaultPreferencesObj[o];
+			}
+		}
+		showLabels = tempPreferencesObj.showLabels;
+		labelType = tempPreferencesObj.labelType;
+
+		return tempPreferencesObj;
+	}
+
+	// Salva o arquivo de preferências no formato JSON.
+	function saveDefaultPreferences() {
+		// Cria a pasta se ela não existir
+		if (!scriptPreferencesFolder.exists) scriptPreferencesFolder.create();
+
+		// Remove propriedades extras do objeto de preferências (limpeza)
+		for (var o in PAL_preferencesObj) {
+			if (!PAL_defaultPreferencesObj.hasOwnProperty(o)) delete PAL_preferencesObj[o];
+		}
+
+		// Formata o objeto de preferências em JSON
+		var fileContent = JSON.stringify(PAL_preferencesObj, null, "\t");
+
+		// Caminho completo do arquivo de preferências
+		var filePath = scriptPreferencesPath + '/preferences.json';
+
+		// Salva o arquivo de preferências (a função 'saveTextFile' deve ser definida em outro lugar)
+		return saveTextFile(fileContent, filePath);
+	}
+
+	function readFileContent(file) {
+		var fileContent;
+	
+		file.open('r');
+		file.encoding = 'UTF-8'; // → file encoding
+		fileContent = file.read();
+		file.close();
+	
+		return fileContent.toString();
+	}
+	
+	function writeFileContent(newFile, fileContent) {
+		newFile.open('w');
+		newFile.write(fileContent);
+		newFile.close();
+
+		return newFile;
+	}
+
+	function saveTextFile(fileContent, filePath) {
+		var newFile = new File(filePath);
+
+		newFile.encoding = 'UTF-8'; // → file encoding
+		return writeFileContent(newFile, fileContent);
+	}
 
 	// ---------------------------------------------------------------------------------
 
@@ -106,19 +213,7 @@ function O_PALETTERO_UTL(thisObj) {
 		var schemaNS = XMPMeta.getNamespaceURI("xmp");
 		var propName = "xmp:Label";
 
-		var swatchesArray = [
-			'#F13333',
-			'#FF4D4D',
-			'#FE674C',
-			'#FF8F4D',
-			'#FFC44E',
-			'#5DE6A2',
-			'#80C0FE',
-			'#B5ADFF',
-			'#FF8CCD',
-			'#FF739A',
-			'#FF5A68',
-		];
+		var swatchesArray = PAL_preferencesObj.swatches
 
 		try {
 			var propVal = mData.getProperty(schemaNS, propName);
@@ -234,7 +329,27 @@ function O_PALETTERO_UTL(thisObj) {
 			// var swatch2 = colorGrp.children[2];
 
 			// swatch0.text = '';
-			swatch1.text = rgbToHEX(swatch1.swatchColor);
+			if (showLabels) {
+				var tempLab = rgbToHEX(swatch1.swatchColor);
+				
+				if (labelType == 'RGB'){
+
+					var tempLab = rgbToRGB(swatch1.swatchColor).join(', ');
+
+					// for (var l = 0; l < labelArray.length; l++){
+					// 	while (labelArray[l].length < 3) labelArray[l] = '0' + labelArray[l];
+
+					// 	labelArray[l] = labelType[l] + ': ' + labelArray[l];
+					// 	tempLab = labelArray.join('\n');
+					// }
+
+				}
+				swatch1.text = tempLab;
+
+				var edgeLimit = labelType == 'RGB' ? 40 : 60;
+				if ((edge - 64) / swatchesCount < edgeLimit) swatch1.text = '';
+			}
+			// swatch1.notify('onDraw');
 			// swatch2.text = '';
 
 			// swatch0.minimumSize = isRow ? [20, 20] : [20, 20];
@@ -245,7 +360,6 @@ function O_PALETTERO_UTL(thisObj) {
 			swatch1.size = [mainSwatchWidth, mainSwatchHeight];
 			// swatch2.size = [secSwatchWidth, secSwatchHeight];
 
-			if ((edge - 64) / swatchesCount < 60) swatch1.text = '';
 			colorGrp.layout.layout(true);
 			swatchesGrp.layout.layout(true);
 		}
@@ -255,6 +369,31 @@ function O_PALETTERO_UTL(thisObj) {
 	}
 
 	// ---------------------------------------------------------------------------------
+
+	function themeDivider(sectionGrp) {
+		var newDiv = sectionGrp.add('customButton', [0, 0, 1, 1]);
+		newDiv.alignment = ['fill', 'center'];
+		setUiCtrlColor(newDiv, divColor1);
+		newDiv.onDraw = customDraw;
+
+		return newDiv;
+	}
+
+	// Função para desenhar o botão personalizado.
+	function customDraw() {
+		with (this) {
+			// Refere-se ao próprio botão (this).
+			graphics.drawOSControl(); // Desenha o contorno padrão do botão.
+			graphics.rectPath(0, 0, size[0], size[1]); // Define o caminho de um retângulo no tamanho do botão.
+			graphics.fillPath(fillBrush); // Preenche o retângulo com a cor definida em 'fillBrush'.
+		}
+	}
+
+	function setUiCtrlColor(ctrl, hex) {
+		var color = hexToRgb(hex); // Converte a cor hexadecimal em RGB.
+		var bType = ctrl.graphics.BrushType.SOLID_COLOR; // Define o tipo do pincel como cor sólida.
+		ctrl.fillBrush = ctrl.graphics.newBrush(bType, color); // Cria um novo pincel com a cor e o aplica ao botão.
+	}
 
 	function colorSwatch(sectionGrp, swatchProperties) {
 
@@ -266,7 +405,7 @@ function O_PALETTERO_UTL(thisObj) {
 		var rgbArray = isHEX ? hexToRgb(color) : color;
 
 		newUiCtrlObj.swatch = sectionGrp.add('customButton');
-		newUiCtrlObj.swatch.text = hexCode;
+		newUiCtrlObj.swatch.text = '';
 		newUiCtrlObj.swatch.swatchColor = rgbArray;
 
 		if (swatchProperties.secSwatch == undefined) swatchProperties.secSwatch = false;
@@ -340,7 +479,23 @@ function O_PALETTERO_UTL(thisObj) {
 					// swatch0.swatchColor = hexToRgb(secColor(this.swatchColor, 1.2));
 					// swatch2.swatchColor = hexToRgb(secColor(this.swatchColor, 0.8));
 
-					this.text = rgbToHEX(this.swatchColor);
+					if (showLabels) {
+						var tempLab = rgbToHEX(this.swatchColor);
+						
+						if (labelType == 'RGB'){
+		
+							var tempLab = rgbToRGB(this.swatchColor).join(',');
+		
+							// for (var l = 0; l < labelArray.length; l++){
+							// 	while (labelArray[l].length < 3) labelArray[l] = '0' + labelArray[l];
+		
+							// 	labelArray[l] = labelType[l] + ': ' + labelArray[l];
+							// 	tempLab = labelArray.join('\n');
+							// }
+						}
+						this.text = tempLab;
+					}
+		
 					// this.helpTip = [
 					// 	'HEX: ' + hexCode,
 					// 	'RGB: ' + rgbToRGB(rgbArray).join(', '),
@@ -374,12 +529,13 @@ function O_PALETTERO_UTL(thisObj) {
 		var textPen = g.newPen(g.PenType.SOLID_COLOR, textColor, 1);
 		var pathPen = g.newPen(g.PenType.SOLID_COLOR, button.swatchColor, 2);
 		var fillBrush = g.newBrush(g.BrushType.SOLID_COLOR, button.swatchColor);
-		// var textSize = g.measureString(button.text);
 
 		button.onDraw = function () {
 
 			var h = this.size.height;
 			var w = this.size.width;
+			// var textSize = this.graphics.measureString(this.text);
+			// alert(textSize);
 
 			if (hover) pathPen = g.newPen(g.PenType.SOLID_COLOR, hexToRgb(normalColor1), 2);
 
@@ -388,7 +544,19 @@ function O_PALETTERO_UTL(thisObj) {
 			g.fillPath(fillBrush);
 			g.strokePath(pathPen);
 
-			if (!this.secSwatch) g.drawString(this.text, textPen, 10, 0);
+			if (!showLabels) return;
+
+			if (labelType == '#HEX') g.drawString(this.text, textPen, 10, 0);
+			if (labelType == 'RGB') {
+
+				if (h > 60) {
+					g.drawString(this.text.split(',')[0], textPen, 14, 0);
+					g.drawString(this.text.split(',')[1], textPen, 10, 16);
+					g.drawString(this.text.split(',')[2], textPen, 10, 32);
+				} else {
+					g.drawString(this.text, textPen, 10, 0);
+				}
+			}
 		};
 	}
 
@@ -450,7 +618,7 @@ function O_PALETTERO_UTL(thisObj) {
 
 						if (array.indexOf(refHEX) >= 0) continue;
 						if (refHEX == '#FF0000' && !prop.isModified) continue;
-						
+
 						// alert(prop.name + ': ' + prop.parentProperty.matchName);
 						array.push(refHEX);
 					}
@@ -513,8 +681,8 @@ function O_PALETTERO_UTL(thisObj) {
 		var prefBtn = btnGrp2.add('statictext', undefined, '≡');
 		prefBtn.justify = 'center';
 		prefBtn.preferredSize = [32, 32];
-		prefBtn.enabled = false;
-		// setCtrlHighlight(prefBtn, normalColor1, highlightColor1);
+		setCtrlHighlight(prefBtn, normalColor1, highlightColor1);
+		// prefBtn.enabled = false;
 
 		setBgColor(PAL_w, bgColor1);
 		buildPalette(swatchesGrp);
@@ -618,6 +786,23 @@ function O_PALETTERO_UTL(thisObj) {
 			}
 
 			if (c.button == 2) sortPalette();
+
+			buildPalette(swatchesGrp);
+			PAL_layout(PAL_w);
+		});
+
+		// ---------------------------------------------------------------------------------
+
+		prefBtn.addEventListener('click', function (c) {
+
+			if (c.button == 0) {
+				PAL_preferencesDialog();
+			}
+
+			while (swatchesGrp.children.length > 0) {
+
+				swatchesGrp.remove(swatchesGrp.children[0]);
+			}
 
 			buildPalette(swatchesGrp);
 			PAL_layout(PAL_w);
