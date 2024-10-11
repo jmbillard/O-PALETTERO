@@ -14,6 +14,7 @@ function O_PALETTERO_UTL(thisObj) {
 	// Emojis e mensagens (opcional)
 	var lol = 'Σ(っ °Д °;)っ        ';
 	var relax = 'ヽ(✿ﾟ▽ﾟ)ノ        ';
+	var appV = parseInt(app.buildName.substring(0, 2));
 
 	var lClick = '◖  →  ';
 	var rClick = ' ◗  →  ';
@@ -58,30 +59,26 @@ function O_PALETTERO_UTL(thisObj) {
 		labelType: '#HEX'
 	};
 
-	// Chama a função para carregar as preferências ao iniciar o script
 	var PAL_preferencesObj = loadDefaultPreferences();
 	var showLabels = PAL_preferencesObj.showLabels;
 	var labelType = PAL_preferencesObj.labelType;
 
 	function loadDefaultPreferences() {
-		// Tenta carregar o arquivo de preferências
+
 		var JSONPreferencesFile = new File(scriptPreferencesPath + '/preferences.json');
 		var tempPreferencesObj = {};
 
-		// Se o arquivo existir, tenta ler seu conteúdo
 		if (JSONPreferencesFile.exists) {
-			var JSONContent = readFileContent(JSONPreferencesFile); // Lê o conteúdo do arquivo JSON
+			var JSONContent = readFileContent(JSONPreferencesFile);
 
 			try {
-				tempPreferencesObj = JSON.parse(JSONContent); // Converte o conteúdo JSON para um objeto JavaScript
+				tempPreferencesObj = JSON.parse(JSONContent);
 
 			} catch (err) {
-				// Exibe um alerta se houver erro ao carregar o JSON
 				alert('Falha ao carregar as preferências... ' + lol + '\n' + err.message);
 			}
 		}
 
-		// Preenche as preferências com os valores padrão, caso não existam
 		for (var o in PAL_defaultPreferencesObj) {
 			if (!tempPreferencesObj.hasOwnProperty(o)) {
 				tempPreferencesObj[o] = PAL_defaultPreferencesObj[o];
@@ -93,37 +90,31 @@ function O_PALETTERO_UTL(thisObj) {
 		return tempPreferencesObj;
 	}
 
-	// Salva o arquivo de preferências no formato JSON.
 	function saveDefaultPreferences() {
-		// Cria a pasta se ela não existir
+
 		if (!scriptPreferencesFolder.exists) scriptPreferencesFolder.create();
 
-		// Remove propriedades extras do objeto de preferências (limpeza)
 		for (var o in PAL_preferencesObj) {
 			if (!PAL_defaultPreferencesObj.hasOwnProperty(o)) delete PAL_preferencesObj[o];
 		}
 
-		// Formata o objeto de preferências em JSON
 		var fileContent = JSON.stringify(PAL_preferencesObj, null, "\t");
-
-		// Caminho completo do arquivo de preferências
 		var filePath = scriptPreferencesPath + '/preferences.json';
 
-		// Salva o arquivo de preferências (a função 'saveTextFile' deve ser definida em outro lugar)
 		return saveTextFile(fileContent, filePath);
 	}
 
 	function readFileContent(file) {
 		var fileContent;
-	
+
 		file.open('r');
-		file.encoding = 'UTF-8'; // → file encoding
+		file.encoding = 'UTF-8';
 		fileContent = file.read();
 		file.close();
-	
+
 		return fileContent.toString();
 	}
-	
+
 	function writeFileContent(newFile, fileContent) {
 		newFile.open('w');
 		newFile.write(fileContent);
@@ -135,7 +126,7 @@ function O_PALETTERO_UTL(thisObj) {
 	function saveTextFile(fileContent, filePath) {
 		var newFile = new File(filePath);
 
-		newFile.encoding = 'UTF-8'; // → file encoding
+		newFile.encoding = 'UTF-8';
 		return writeFileContent(newFile, fileContent);
 	}
 
@@ -229,17 +220,7 @@ function O_PALETTERO_UTL(thisObj) {
 	function buildColorGrp(colorGrp, color) {
 
 		var tempArray = [
-			// {
-			// 	color: secColor(color, 1.2),
-			// 	secSwatch: true
-			// },
-			{
-				color: color
-			}
-			// {
-			// 	color: secColor(color, 0.8),
-			// 	secSwatch: true
-			// }
+			{ color: color }
 		];
 
 		for (var c = 0; c < tempArray.length; c++) {
@@ -290,7 +271,6 @@ function O_PALETTERO_UTL(thisObj) {
 		var w = win.size.width;
 		var h = win.size.height;
 		var isRow = w > h;
-		var edge = isRow ? w : h * 1.8;
 
 		var btnGrp1 = win.children[0];
 		var swatchesGrp = win.children[1];
@@ -316,49 +296,57 @@ function O_PALETTERO_UTL(thisObj) {
 		var mainSwatchWidth = isRow ? (w - btnGrpWidth) / swatchesCount : w;
 		var mainSwatchHeight = isRow ? h : (h - btnGrpHeight) / swatchesCount;
 
-		// var secSwatchWidth = isRow ? mainSwatchWidth : 20;
-		// var secSwatchHeight = isRow ? 20 : mainSwatchHeight;
-
 		for (var s = 0; s < swatchesCount; s++) {
 
 			var colorGrp = swatchesGrp.children[s];
 			colorGrp.orientation = btnOrientation;
 
-			// var swatch0 = colorGrp.children[0];
-			var swatch1 = colorGrp.children[0];
-			// var swatch2 = colorGrp.children[2];
+			var swatch = colorGrp.children[0];
+			var tempLab = '';
 
-			// swatch0.text = '';
-			if (showLabels) {
-				var tempLab = rgbToHEX(swatch1.swatchColor);
-				
-				if (labelType == 'RGB'){
 
-					var tempLab = rgbToRGB(swatch1.swatchColor).join(', ');
+			if (labelType == '#HEX') tempLab = rgbToHEX(swatch.swatchColor);
+			if (labelType == 'RGB') tempLab = rgbToRGB(swatch.swatchColor);
+			if (labelType == 'HSB') tempLab = rgbToHsb(swatch.swatchColor);
 
-					// for (var l = 0; l < labelArray.length; l++){
-					// 	while (labelArray[l].length < 3) labelArray[l] = '0' + labelArray[l];
+			if (labelType != '#HEX') {
 
-					// 	labelArray[l] = labelType[l] + ': ' + labelArray[l];
-					// 	tempLab = labelArray.join('\n');
-					// }
+				for (var l = 0; l < tempLab.length; l++) {
 
+					tempLab[l] = labelType[l] + ':' + tempLab[l];
 				}
-				swatch1.text = tempLab;
-
-				var edgeLimit = labelType == 'RGB' ? 40 : 60;
-				if ((edge - 64) / swatchesCount < edgeLimit) swatch1.text = '';
+				tempLab = tempLab.join('\n');
 			}
-			// swatch1.notify('onDraw');
-			// swatch2.text = '';
 
-			// swatch0.minimumSize = isRow ? [20, 20] : [20, 20];
-			swatch1.minimumSize = isRow ? [20, btnGrpHeight] : [btnGrpWidth, 20];
-			// swatch2.minimumSize = isRow ? [20, 20] : [20, 20];
+			swatch.helpTip = tempLab;
+			// swatch.helpTip += [
+			// 	'\n-----------------',
+			// 	lClick + 'aplicar Fill',
+			// 	rClick + 'editar cor',
+			// 	'Alt + ' + rClick + 'excluir cor',
+			// ].join('\n');
 
-			// swatch0.size = [secSwatchWidth, secSwatchHeight];
-			swatch1.size = [mainSwatchWidth, mainSwatchHeight];
-			// swatch2.size = [secSwatchWidth, secSwatchHeight];
+			if (showLabels) {
+				if (mainSwatchHeight < 60) tempLab = tempLab.replace(/\n/g, ', ');
+
+				swatch.text = tempLab;
+				
+				if (isRow) {
+					
+					if (labelType == '#HEX' && mainSwatchWidth < 60) swatch.text = '';
+					if (labelType != '#HEX' && mainSwatchWidth < 50) swatch.text = '';
+				}
+				if (!isRow) {
+					
+					if (mainSwatchHeight < 32) swatch.text = '';
+					if (mainSwatchWidth < 60) swatch.text = '';
+					if (labelType != '#HEX' && mainSwatchWidth < 100) swatch.text = '';
+				}
+			}
+
+			swatch.minimumSize = isRow ? [20, btnGrpHeight] : [btnGrpWidth, 20];
+
+			swatch.size = [mainSwatchWidth, mainSwatchHeight];
 
 			colorGrp.layout.layout(true);
 			swatchesGrp.layout.layout(true);
@@ -379,20 +367,20 @@ function O_PALETTERO_UTL(thisObj) {
 		return newDiv;
 	}
 
-	// Função para desenhar o botão personalizado.
 	function customDraw() {
+
 		with (this) {
-			// Refere-se ao próprio botão (this).
-			graphics.drawOSControl(); // Desenha o contorno padrão do botão.
-			graphics.rectPath(0, 0, size[0], size[1]); // Define o caminho de um retângulo no tamanho do botão.
-			graphics.fillPath(fillBrush); // Preenche o retângulo com a cor definida em 'fillBrush'.
+			graphics.drawOSControl();
+			graphics.rectPath(0, 0, size[0], size[1]);
+			graphics.fillPath(fillBrush);
 		}
 	}
 
 	function setUiCtrlColor(ctrl, hex) {
-		var color = hexToRgb(hex); // Converte a cor hexadecimal em RGB.
-		var bType = ctrl.graphics.BrushType.SOLID_COLOR; // Define o tipo do pincel como cor sólida.
-		ctrl.fillBrush = ctrl.graphics.newBrush(bType, color); // Cria um novo pincel com a cor e o aplica ao botão.
+
+		var color = hexToRgb(hex);
+		var bType = ctrl.graphics.BrushType.SOLID_COLOR;
+		ctrl.fillBrush = ctrl.graphics.newBrush(bType, color);
 	}
 
 	function colorSwatch(sectionGrp, swatchProperties) {
@@ -407,23 +395,6 @@ function O_PALETTERO_UTL(thisObj) {
 		newUiCtrlObj.swatch = sectionGrp.add('customButton');
 		newUiCtrlObj.swatch.text = '';
 		newUiCtrlObj.swatch.swatchColor = rgbArray;
-
-		if (swatchProperties.secSwatch == undefined) swatchProperties.secSwatch = false;
-		newUiCtrlObj.swatch.secSwatch = swatchProperties.secSwatch;
-
-		// newUiCtrlObj.swatch.helpTip = [
-		// 	'HEX: ' + hexCode,
-		// 	'RGB: ' + rgbToRGB(rgbArray).join(', '),
-		// 	'',
-		// 	lClick + 'aplicar fill'
-		// ].join('\n');
-
-		// if (!swatchProperties.secSwatch) newUiCtrlObj.swatch.helpTip += [
-		// 	'',
-		// 	rClick + 'editar cor',
-		// 	'',
-		// 	'Alt + ' + rClick + 'excluir cor'
-		// ].join('\n');
 
 		drawColorSwatch(newUiCtrlObj.swatch, false);
 
@@ -454,65 +425,22 @@ function O_PALETTERO_UTL(thisObj) {
 
 		newUiCtrlObj.swatch.addEventListener('click', function (c) {
 
-			if (this.secSwatch) return;
-
 			var colorGrp = this.parent;
 			var swatchesGrp = colorGrp.parent;
 			var win = swatchesGrp.parent;
+
 			if (c.button == 2) {
 
-				if (ScriptUI.environment.keyboardState.altKey) {
+				if (!ScriptUI.environment.keyboardState.altKey) {
+					var newColor = new colorPicker(this.swatchColor);
+					new colorSwatch(colorGrp, { color: newColor });
+					colorGrp.remove(this);
 
+				} else {
 					swatchesGrp.remove(colorGrp);
-
-					saveProjectPalette(swatchesGrp);
-					PAL_layout(win);
-
-					return;
 				}
-
-				try {
-					// var swatch0 = this.parent.children[0];
-					// var swatch2 = this.parent.children[2];
-
-					this.swatchColor = new colorPicker(this.swatchColor);
-					// swatch0.swatchColor = hexToRgb(secColor(this.swatchColor, 1.2));
-					// swatch2.swatchColor = hexToRgb(secColor(this.swatchColor, 0.8));
-
-					if (showLabels) {
-						var tempLab = rgbToHEX(this.swatchColor);
-						
-						if (labelType == 'RGB'){
-		
-							var tempLab = rgbToRGB(this.swatchColor).join(',');
-		
-							// for (var l = 0; l < labelArray.length; l++){
-							// 	while (labelArray[l].length < 3) labelArray[l] = '0' + labelArray[l];
-		
-							// 	labelArray[l] = labelType[l] + ': ' + labelArray[l];
-							// 	tempLab = labelArray.join('\n');
-							// }
-						}
-						this.text = tempLab;
-					}
-		
-					// this.helpTip = [
-					// 	'HEX: ' + hexCode,
-					// 	'RGB: ' + rgbToRGB(rgbArray).join(', '),
-					// 	'',
-					// 	lClick + 'aplicar fill',
-					// 	rClick + 'editar cor',
-					// 	'',
-					// 	'Alt + ' + lClick + 'excluir cor'
-					// ].join('\n');
-
-					drawColorSwatch(this, false);
-					// drawColorSwatch(swatch0, false);
-					// drawColorSwatch(swatch2, false);
-
-					saveProjectPalette(swatchesGrp);
-
-				} catch (err) { }
+				saveProjectPalette(swatchesGrp);
+				PAL_layout(win);
 			}
 		});
 
@@ -534,8 +462,6 @@ function O_PALETTERO_UTL(thisObj) {
 
 			var h = this.size.height;
 			var w = this.size.width;
-			// var textSize = this.graphics.measureString(this.text);
-			// alert(textSize);
 
 			if (hover) pathPen = g.newPen(g.PenType.SOLID_COLOR, hexToRgb(normalColor1), 2);
 
@@ -546,16 +472,16 @@ function O_PALETTERO_UTL(thisObj) {
 
 			if (!showLabels) return;
 
-			if (labelType == '#HEX') g.drawString(this.text, textPen, 10, 0);
-			if (labelType == 'RGB') {
+			var textLinesArray = this.text.split('\n');
 
-				if (h > 60) {
-					g.drawString(this.text.split(',')[0], textPen, 14, 0);
-					g.drawString(this.text.split(',')[1], textPen, 10, 16);
-					g.drawString(this.text.split(',')[2], textPen, 10, 32);
-				} else {
-					g.drawString(this.text, textPen, 10, 0);
-				}
+			for (var l = 0; l < textLinesArray.length; l++) {
+
+				var px = 10; //l == 0 ? 14 : 10;
+				var py = l == 0 ? 0 : py += 16;
+
+				if (appV > 24 && l == 0) py += 10;
+
+				g.drawString(textLinesArray[l], textPen, px, py);
 			}
 		};
 	}
@@ -807,22 +733,6 @@ function O_PALETTERO_UTL(thisObj) {
 			buildPalette(swatchesGrp);
 			PAL_layout(PAL_w);
 		});
-
-		// ---------------------------------------------------------------------------------
-
-		// sortBtn.addEventListener('click', function (c) {
-
-		// 	if (c.button == 0) {
-
-		// 		while (swatchesGrp.children.length > 0) {
-
-		// 			swatchesGrp.remove(swatchesGrp.children[0]);
-		// 		}
-		// 		sortPalette(swatchesGrp);
-		// 		saveProjectPalette(swatchesGrp);
-		// 		PAL_layout(PAL_w);
-		// 	}
-		// });
 
 		// ---------------------------------------------------------------------------------
 

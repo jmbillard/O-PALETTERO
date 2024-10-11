@@ -17,7 +17,7 @@ function PAL_preferencesDialog() {
 	var ckbGrpSpacing = 20;
 	var btnGrpSpacing = 10;
 	var drpGrpSpacing = 2;
-	var txtSize = [120, 30];
+	var txtSize = [150, 30];
 	var dropSize = [85, 24];
 
 	//---------------------------------------------------------
@@ -45,7 +45,7 @@ function PAL_preferencesDialog() {
 	labelCkb.value = showLabels;
 
 	var labelInfoGrp = labelMainGrp.add('group');
-	labelInfoGrp.spacing = 60;
+	labelInfoGrp.spacing = 30;
 	labelInfoGrp.margins = [0, 8, 0, 4];
 
 	var hexRdo = labelInfoGrp.add('radiobutton', undefined, '#HEX');
@@ -53,7 +53,11 @@ function PAL_preferencesDialog() {
 	hexRdo.value = hexRdo.text == labelType;
 
 	var rgbRdo = labelInfoGrp.add('radiobutton', undefined, 'RGB');
-	rgbRdo.helpTip = 'array de valores RGB';
+	rgbRdo.helpTip = 'valores RGB (red, green, blue)';
+	rgbRdo.value = rgbRdo.text == labelType;
+
+	var hsbRdo = labelInfoGrp.add('radiobutton', undefined, 'HSB');
+	rgbRdo.helpTip = 'valores HSB (hue, saturation, brightness)';
 	rgbRdo.value = rgbRdo.text == labelType;
 
 	//
@@ -68,7 +72,7 @@ function PAL_preferencesDialog() {
 
 	*/
 
-	rgbRdo.onClick = hexRdo.onClick = function () {
+	hsbRdo.onClick = rgbRdo.onClick = hexRdo.onClick = function () {
 		labelType = this.text;
 		PAL_preferencesObj.labelType = this.text;
 
