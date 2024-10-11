@@ -16,7 +16,7 @@ function O_PALETTERO_UTL(thisObj) {
 	var relax = 'ヽ(✿ﾟ▽ﾟ)ノ        ';
 	var appV = parseInt(app.buildName.substring(0, 2));
 
-	var lClick = '◖  →  ';
+	var lClick = '◖   →  ';
 	var rClick = ' ◗  →  ';
 	var dClick = '◖◖ →  ';
 
@@ -220,7 +220,12 @@ function O_PALETTERO_UTL(thisObj) {
 	function buildColorGrp(colorGrp, color) {
 
 		var tempArray = [
-			{ color: color }
+			{
+				color: color,
+				width: 20,
+				height: 20
+			}
+			
 		];
 
 		for (var c = 0; c < tempArray.length; c++) {
@@ -287,14 +292,13 @@ function O_PALETTERO_UTL(thisObj) {
 		win.orientation = grpOrientation;
 		swatchesGrp.orientation = grpOrientation;
 		btnGrp1.orientation = btnOrientation;
-		btnGrp1.alignment = btnAlignment;
 		btnGrp2.orientation = btnOrientation;
+		btnGrp1.alignment = btnAlignment;
 		btnGrp2.alignment = btnAlignment;
 
 		var swatchesCount = swatchesGrp.children.length;
-
-		var mainSwatchWidth = isRow ? (w - btnGrpWidth) / swatchesCount : w;
-		var mainSwatchHeight = isRow ? h : (h - btnGrpHeight) / swatchesCount;
+		var swatchWidth = isRow ? (w - btnGrpWidth) / swatchesCount : w;
+		var swatchHeight = isRow ? h : (h - btnGrpHeight) / swatchesCount;
 
 		for (var s = 0; s < swatchesCount; s++) {
 
@@ -302,8 +306,13 @@ function O_PALETTERO_UTL(thisObj) {
 			colorGrp.orientation = btnOrientation;
 
 			var swatch = colorGrp.children[0];
-			var tempLab = '';
+			swatch.minimumSize = isRow ? [20, btnGrpHeight] : [btnGrpWidth, 20];
 
+			// if (isRow) swatch.maximumSize.height = 60;
+			// if (!isRow) swatch.maximumSize.width = 60;
+			swatch.size = [swatchWidth, swatchHeight];
+
+			var tempLab = '';
 
 			if (labelType == '#HEX') tempLab = rgbToHEX(swatch.swatchColor);
 			if (labelType == 'RGB') tempLab = rgbToRGB(swatch.swatchColor);
@@ -327,26 +336,24 @@ function O_PALETTERO_UTL(thisObj) {
 			// ].join('\n');
 
 			if (showLabels) {
-				if (mainSwatchHeight < 60) tempLab = tempLab.replace(/\n/g, ', ');
+				if (swatchHeight < 60) tempLab = tempLab.replace(/\n/g, ', ');
+				if (isRow && swatchWidth > 120) tempLab = tempLab.replace(/\n/g, ', ');
 
 				swatch.text = tempLab;
 				
 				if (isRow) {
 					
-					if (labelType == '#HEX' && mainSwatchWidth < 60) swatch.text = '';
-					if (labelType != '#HEX' && mainSwatchWidth < 50) swatch.text = '';
+					if (labelType == '#HEX' && swatchWidth < 60) swatch.text = '';
+					if (labelType != '#HEX' && swatchWidth < 50) swatch.text = '';
+
 				}
 				if (!isRow) {
 					
-					if (mainSwatchHeight < 32) swatch.text = '';
-					if (mainSwatchWidth < 60) swatch.text = '';
-					if (labelType != '#HEX' && mainSwatchWidth < 100) swatch.text = '';
+					if (swatchHeight < 32) swatch.text = '';
+					if (swatchWidth < 60) swatch.text = '';
+					if (labelType != '#HEX' && swatchWidth < 100 && swatchHeight < 60) swatch.text = '';
 				}
 			}
-
-			swatch.minimumSize = isRow ? [20, btnGrpHeight] : [btnGrpWidth, 20];
-
-			swatch.size = [mainSwatchWidth, mainSwatchHeight];
 
 			colorGrp.layout.layout(true);
 			swatchesGrp.layout.layout(true);
@@ -389,11 +396,14 @@ function O_PALETTERO_UTL(thisObj) {
 		var color = swatchProperties.color;
 
 		var isHEX = color.toString().match(/^#/);
-		var hexCode = isHEX ? color : rgbToHEX(color);
 		var rgbArray = isHEX ? hexToRgb(color) : color;
 
 		newUiCtrlObj.swatch = sectionGrp.add('customButton');
 		newUiCtrlObj.swatch.text = '';
+		// newUiCtrlObj.swatch.size = [
+		// 	swatchProperties.width,
+		// 	swatchProperties.height
+		// ];
 		newUiCtrlObj.swatch.swatchColor = rgbArray;
 
 		drawColorSwatch(newUiCtrlObj.swatch, false);
@@ -476,10 +486,10 @@ function O_PALETTERO_UTL(thisObj) {
 
 			for (var l = 0; l < textLinesArray.length; l++) {
 
-				var px = 10; //l == 0 ? 14 : 10;
-				var py = l == 0 ? 0 : py += 16;
+				var px = 10;
+				var py = l == 0 ? 2 : py += 16;
 
-				if (appV > 24 && l == 0) py += 10;
+				if (appV > 24 && l == 0) py += 8;
 
 				g.drawString(textLinesArray[l], textPen, px, py);
 			}
@@ -576,7 +586,6 @@ function O_PALETTERO_UTL(thisObj) {
 		PAL_w.margins = 0;
 
 		var btnGrp1 = PAL_w.add('group');
-		btnGrp1.orientation = 'column';
 		btnGrp1.spacing = 0;
 
 		var addBtn = btnGrp1.add('statictext', undefined, '+');
@@ -601,17 +610,16 @@ function O_PALETTERO_UTL(thisObj) {
 		swatchesGrp.spacing = 0;
 
 		var btnGrp2 = PAL_w.add('group');
-		btnGrp2.orientation = 'column';
 		btnGrp2.spacing = 0;
 
 		var prefBtn = btnGrp2.add('statictext', undefined, '≡');
 		prefBtn.justify = 'center';
 		prefBtn.preferredSize = [32, 32];
 		setCtrlHighlight(prefBtn, normalColor1, highlightColor1);
-		// prefBtn.enabled = false;
 
 		setBgColor(PAL_w, bgColor1);
 		buildPalette(swatchesGrp);
+		PAL_layout(PAL_w);
 
 		// ---------------------------------------------------------------------------------
 
@@ -737,7 +745,7 @@ function O_PALETTERO_UTL(thisObj) {
 		// ---------------------------------------------------------------------------------
 
 		PAL_w.onShow = PAL_w.onResizing = PAL_w.onResize = function () {
-			PAL_layout(PAL_w);
+			PAL_layout(this);
 		};
 
 		return PAL_w;
