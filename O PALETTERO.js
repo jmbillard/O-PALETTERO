@@ -494,16 +494,20 @@ function O_PALETTERO_UTL(thisObj) {
 
 			if (c.button == 2) {
 
-				if (!ScriptUI.environment.keyboardState.altKey) {
-					var newColor = new colorPicker(this.swatchColor);
-					new colorSwatch(colorGrp, { color: newColor });
-					colorGrp.remove(this);
+				try {
 
-				} else {
-					swatchesGrp.remove(colorGrp);
-				}
-				saveProjectPalette(swatchesGrp);
-				PAL_layout(win);
+					if (!ScriptUI.environment.keyboardState.altKey) {
+						var newColor = new colorPicker(this.swatchColor);
+						new colorSwatch(colorGrp, { color: newColor });
+						colorGrp.remove(this);
+	
+					} else {
+						swatchesGrp.remove(colorGrp);
+					}
+					saveProjectPalette(swatchesGrp);
+					PAL_layout(win);
+
+				} catch (err) { }
 			}
 		});
 

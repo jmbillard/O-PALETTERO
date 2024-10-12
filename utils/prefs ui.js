@@ -113,15 +113,18 @@ function PAL_preferencesDialog() {
 		});
 
 		color.swatch.onClick = function () {
-			var colorGrp = this.parent;
-			var swatchesGrp = colorGrp.parent;
 
-			alert('oi');
-			this.swatchColor = new colorPicker(this.swatchColor);
-			colorGrp.children[1].text = rgbToHEX(this.swatchColor);
+			try {
+				var colorGrp = this.parent;
+				var swatchesGrp = colorGrp.parent;
+	
+				this.swatchColor = new colorPicker(this.swatchColor);
+				colorGrp.children[1].text = rgbToHEX(this.swatchColor);
+	
+				drawColorSwatch(this, false);
+				saveProjectPalette(swatchesGrp);
 
-			drawColorSwatch(this, false);
-			saveProjectPalette(swatchesGrp);
+			} catch (err) { }
 		}
 	}
 
