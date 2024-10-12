@@ -42,17 +42,50 @@ function O_PALETTERO_UTL(thisObj) {
 	// Define os valores padrão das preferências do usuário.
 	var PAL_defaultPreferencesObj = {
 		swatches: [
-			'#F13333',
-			'#FF4D4D',
-			'#FE674C',
-			'#FF8F4D',
-			'#FFC44E',
-			'#5DE6A2',
-			'#80C0FE',
-			'#B5ADFF',
-			'#FF8CCD',
-			'#FF739A',
-			'#FF5A68',
+			{
+				color: '#F13333',
+				label: ''
+			},
+			{
+				color: '#FF4D4D',
+				label: ''
+			},
+			{
+				color: '#FE674C',
+				label: ''
+			},
+			{
+				color: '#FF8F4D',
+				label: ''
+			},
+			{
+				color: '#FFC44E',
+				label: ''
+			},
+			{
+				color: '#5DE6A2',
+				label: ''
+			},
+			{
+				color: '#80C0FE',
+				label: ''
+			},
+			{
+				color: '#B5ADFF',
+				label: ''
+			},
+			{
+				color: '#FF8CCD',
+				label: ''
+			},
+			{
+				color: '#FF739A',
+				label: ''
+			},
+			{
+				color: '#FF5A68',
+				label: ''
+			}
 		],
 
 		showLabels: true,
@@ -80,6 +113,7 @@ function O_PALETTERO_UTL(thisObj) {
 		}
 
 		for (var o in PAL_defaultPreferencesObj) {
+
 			if (!tempPreferencesObj.hasOwnProperty(o)) {
 				tempPreferencesObj[o] = PAL_defaultPreferencesObj[o];
 			}
@@ -204,13 +238,38 @@ function O_PALETTERO_UTL(thisObj) {
 		var schemaNS = XMPMeta.getNamespaceURI("xmp");
 		var propName = "xmp:Label";
 
-		var swatchesArray = PAL_preferencesObj.swatches
+		var swatchesArray = [];
+
+		// try {
+
+		for (var s = 0; s < PAL_preferencesObj.swatches.length; s++) {
+
+			if (!PAL_preferencesObj.swatches[s].hasOwnProperty('color')) continue;
+
+			swatchesArray.push(PAL_preferencesObj.swatches[s].color);
+		}
+
+		if (swatchesArray.length == 0) {
+
+			for (var s = 0; s < PAL_defaultPreferencesObj.swatches.length; s++) {
+
+				swatchesArray.push(PAL_defaultPreferencesObj.swatches[s].color);
+			}
+		}
+
+		// } catch (err) {
+
+		// 	for (var s = 0; s < PAL_defaultPreferencesObj.swatches.length; s++) {
+
+		// 		swatchesArray.push(PAL_defaultPreferencesObj.swatches[s].color);
+		// 	}
+		// }
 
 		try {
 			var propVal = mData.getProperty(schemaNS, propName);
 			var tempSwatchesArray = propVal.toString().split('-');
 
-			if (tempSwatchesArray.length > 0 || propVal == 'null') swatchesArray = tempSwatchesArray;
+			if (tempSwatchesArray.length > 0) swatchesArray = tempSwatchesArray;
 
 		} catch (err) { }
 
@@ -225,7 +284,7 @@ function O_PALETTERO_UTL(thisObj) {
 				width: 20,
 				height: 20
 			}
-			
+
 		];
 
 		for (var c = 0; c < tempArray.length; c++) {
@@ -308,8 +367,6 @@ function O_PALETTERO_UTL(thisObj) {
 			var swatch = colorGrp.children[0];
 			swatch.minimumSize = isRow ? [20, btnGrpHeight] : [btnGrpWidth, 20];
 
-			// if (isRow) swatch.maximumSize.height = 60;
-			// if (!isRow) swatch.maximumSize.width = 60;
 			swatch.size = [swatchWidth, swatchHeight];
 
 			var tempLab = '';
@@ -328,27 +385,21 @@ function O_PALETTERO_UTL(thisObj) {
 			}
 
 			swatch.helpTip = tempLab;
-			// swatch.helpTip += [
-			// 	'\n-----------------',
-			// 	lClick + 'aplicar Fill',
-			// 	rClick + 'editar cor',
-			// 	'Alt + ' + rClick + 'excluir cor',
-			// ].join('\n');
 
 			if (showLabels) {
 				if (swatchHeight < 60) tempLab = tempLab.replace(/\n/g, ', ');
 				if (isRow && swatchWidth > 120) tempLab = tempLab.replace(/\n/g, ', ');
 
 				swatch.text = tempLab;
-				
+
 				if (isRow) {
-					
+
 					if (labelType == '#HEX' && swatchWidth < 60) swatch.text = '';
 					if (labelType != '#HEX' && swatchWidth < 50) swatch.text = '';
 
 				}
 				if (!isRow) {
-					
+
 					if (swatchHeight < 32) swatch.text = '';
 					if (swatchWidth < 60) swatch.text = '';
 					if (labelType != '#HEX' && swatchWidth < 100 && swatchHeight < 60) swatch.text = '';
@@ -400,13 +451,15 @@ function O_PALETTERO_UTL(thisObj) {
 
 		newUiCtrlObj.swatch = sectionGrp.add('customButton');
 		newUiCtrlObj.swatch.text = '';
-		// newUiCtrlObj.swatch.size = [
-		// 	swatchProperties.width,
-		// 	swatchProperties.height
-		// ];
+		newUiCtrlObj.swatch.size = [
+			swatchProperties.width,
+			swatchProperties.height
+		];
 		newUiCtrlObj.swatch.swatchColor = rgbArray;
 
 		drawColorSwatch(newUiCtrlObj.swatch, false);
+
+		if (swatchProperties.noEvents) return newUiCtrlObj;
 
 		newUiCtrlObj.swatch.addEventListener('mouseover', function () {
 			drawColorSwatch(this, true);
