@@ -39,7 +39,7 @@ function PAL_preferencesDialog() {
 	nameCkbLab.preferredSize = txtSize;
 
 	var nameCkb = nameCkbGrp.add('checkbox', [8, 4, 24, 18]);
-	nameCkb.value = showNames;
+	nameCkb.value = showColorLabels;
 
 	var labelCkbGrp = labelMainGrp.add('group');
 	labelCkbGrp.spacing = ckbGrpSpacing;
@@ -49,7 +49,7 @@ function PAL_preferencesDialog() {
 	labelCkbLab.preferredSize = txtSize;
 
 	var labelCkb = labelCkbGrp.add('checkbox', [8, 4, 24, 18]);
-	labelCkb.value = showLabels;
+	labelCkb.value = showColorInfo;
 
 	var labelInfoGrp = labelMainGrp.add('group');
 	labelInfoGrp.spacing = 30;
@@ -83,34 +83,35 @@ function PAL_preferencesDialog() {
 
 	var swatchesMainGrp = colorsMainGrp.add('group');
 	swatchesMainGrp.orientation = 'row';
-	swatchesMainGrp.spacing = 4;
+	swatchesMainGrp.spacing = 2;
 
 	var swatchesGrp = swatchesMainGrp.add('group');
 	swatchesGrp.orientation = 'column';
 	swatchesGrp.spacing = 3;
 
-	var ctrlGrp = swatchesMainGrp.add('group');
-	ctrlGrp.orientation = 'column';
-	ctrlGrp.spacing = 0;
+	// var ctrlGrp = swatchesMainGrp.add('group');
+	// ctrlGrp.orientation = 'column';
+	// ctrlGrp.spacing = 0;
 
-	var tempSwatchesArray = loadProjectPalette();
+	var tempSwatchesArray = loadProjectPalette().swatchesArray;
+	var tempLabelsArray = loadProjectPalette().labelsArray;
 	var swatchList = swatchesMainGrp.add(
 		'listbox',
-		[0, 0, 176, tempSwatchesArray.length * 31 + 1],
-		tempSwatchesArray,
-		{
-			multiselect: true
-			// numberOfColumns: 3,
-			// showHeaders: true,
-			// columnTitles: ["English", "French", "Dutch"],
-			// columnWidths: [30,30,100]
-		}
+		[0, 0, 200, tempLabelsArray.length * 31 + 1],
+		tempLabelsArray,
+		// {
+		// 	multiselect: true
+		// numberOfColumns: 3,
+		// showHeaders: true,
+		// columnTitles: ["English", "French", "Dutch"],
+		// columnWidths: [30,30,100]
+		// }
 	);
 	swatchList.itemSize = [160, 30];
-	var swatchesCtrlGrp = swatchesMainGrp.add('group');
-	swatchesCtrlGrp.orientation = 'column';
-	swatchesCtrlGrp.alignment = 'fill';
-	swatchesCtrlGrp.spacing = 3;
+	// var swatchesCtrlGrp = swatchesMainGrp.add('group');
+	// swatchesCtrlGrp.orientation = 'column';
+	// swatchesCtrlGrp.alignment = 'fill';
+	// swatchesCtrlGrp.spacing = 3;
 
 	// var upBtn = swatchesCtrlGrp.add('statictext', undefined, '▲');
 	// // var upBtn = swatchesCtrlGrp.add('statictext', undefined, '⤒');
@@ -130,29 +131,30 @@ function PAL_preferencesDialog() {
 
 	for (var s = 0; s < tempSwatchesArray.length; s++) {
 
-		var tempCtrlGrp = swatchesCtrlGrp.add('group');
-		tempCtrlGrp.orientation = 'column';
-		tempCtrlGrp.spacing = 0;
+		// var tempCtrlGrp = swatchesCtrlGrp.add('group');
+		// tempCtrlGrp.orientation = 'column';
+		// tempCtrlGrp.spacing = 0;
 
-		var upBtn = tempCtrlGrp.add('statictext', undefined, '▲');
-		// var upBtn = swatchesCtrlGrp.add('statictext', undefined, '⤒');
-		upBtn.justify = 'center';
-		upBtn.alignment = ['center', 'top'];
-		upBtn.preferredSize = [20, 14];
-		upBtn.helpTip = lClick + 'subir cores selecionadas';
-		setCtrlHighlight(upBtn, normalColor1, highlightColor1);
+		// var upBtn = tempCtrlGrp.add('statictext', undefined, '▲');
+		// // var upBtn = swatchesCtrlGrp.add('statictext', undefined, '⤒');
+		// upBtn.justify = 'center';
+		// upBtn.alignment = ['center', 'top'];
+		// upBtn.preferredSize = [20, 14];
+		// upBtn.helpTip = lClick + 'subir cores selecionadas';
+		// setCtrlHighlight(upBtn, normalColor1, highlightColor1);
 
-		var downBtn = tempCtrlGrp.add('statictext', undefined, '▼');
-		// var upBtn = swatchesCtrlGrp.add('statictext', undefined, '⤒');
-		downBtn.justify = 'center';
-		downBtn.alignment = ['center', 'bottom'];
-		downBtn.preferredSize = [20, 14];
-		downBtn.helpTip = lClick + 'descer cores selecionadas';
-		setCtrlHighlight(downBtn, normalColor1, highlightColor1);
+		// var downBtn = tempCtrlGrp.add('statictext', undefined, '▼');
+		// // var upBtn = swatchesCtrlGrp.add('statictext', undefined, '⤒');
+		// downBtn.justify = 'center';
+		// downBtn.alignment = ['center', 'bottom'];
+		// downBtn.preferredSize = [20, 14];
+		// downBtn.helpTip = lClick + 'descer cores selecionadas';
+		// setCtrlHighlight(downBtn, normalColor1, highlightColor1);
 
 
 		var swatchProperties = {
 			color: tempSwatchesArray[s],
+			name: tempLabelsArray[s],
 			width: 8,
 			height: 28,
 			noEvents: true,
@@ -160,19 +162,19 @@ function PAL_preferencesDialog() {
 		};
 		var color = new colorSwatch(swatchesGrp, swatchProperties);
 
-		color.swatch.onClick = function () {
-			var colorGrp = this.parent;
-			var swatchesGrp = colorGrp.parent;
-			swatchList.selection = null;
-			swatchList.selection = [this.index];
+		// color.swatch.onClick = function () {
+		// 	var colorGrp = this.parent;
+		// 	var swatchesGrp = colorGrp.parent;
+		// 	swatchList.selection = null;
+		// 	swatchList.selection = [this.index];
 
-			try {
-				this.swatchColor = new colorPicker(this.swatchColor);
-				swatchList.items[this.index].text = rgbToHEX(this.swatchColor);
-				drawColorSwatch(this, false);
-				saveProjectPalette(swatchesGrp);
-			} catch (err) { }
-		};
+		// 	try {
+		// 		this.swatchColor = new colorPicker(this.swatchColor);
+		// 		swatchList.items[this.index].text = rgbToHEX(this.swatchColor);
+		// 		drawColorSwatch(this, false);
+		// 		saveProjectPalette(swatchesGrp);
+		// 	} catch (err) { }
+		// };
 
 		// color.swatch.addEventListener('mouseover', function () {
 		// 	swatchList.selection = null;
@@ -243,8 +245,15 @@ function PAL_preferencesDialog() {
 	//---------------------------------------------------------
 
 	labelCkb.onClick = function () {
-		showLabels = this.value;
-		PAL_preferencesObj.showLabels = this.value;
+		showColorInfo = this.value;
+		PAL_preferencesObj.showColorInfo = this.value;
+
+		saveDefaultPreferences();
+	};
+
+	nameCkb.onClick = function () {
+		showColorLabels = this.value;
+		PAL_preferencesObj.showColorLabels = this.value;
 
 		saveDefaultPreferences();
 	};
@@ -257,5 +266,38 @@ function PAL_preferencesDialog() {
 		PAL_prefW.close();
 	};
 
+	nameTxt.onEnterKey = nameTxt.onChange = function () {
+
+		var tempSelection = swatchList.selection;
+		var tempName = this.text.trim().replace(/[:\-\s]+/g, ' ');
+
+		this.text = tempName;
+		tempSelection.text = tempName;
+		swatchList.active = true;
+	};
+
+	swatchList.onDoubleClick = function () {
+
+		// var colorGrp = this.parent;
+		var swatchesGrp = this.parent.children[0];
+		var swatch = swatchesGrp.children[this.selection.index];
+		// swatchList.selection = null;
+		// swatchList.selection = [this.index];
+
+		try {
+			var tempName = this.selection.text;
+			var isHex = tempName.length == 7 && tempName.match(/^#[A-F0-9]{6}/i);
+
+			swatch.swatchColor = new colorPicker(swatch.swatchColor);
+			this.selection.text = isHex ? rgbToHEX(swatch.swatchColor) : tempName;
+			swatch.label = this.selection.text;
+			drawColorSwatch(swatch, false);
+
+		} catch (err) { alert(err.message); }
+	};
+
+	save.button.onClick = function () {
+		saveProjectPalette(swatchesGrp);
+	}
 	PAL_prefW.show();
 }

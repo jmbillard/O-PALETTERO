@@ -69,7 +69,7 @@ function buildColorGrp(colorGrp, color) {
 }
 
 function buildPalette(sectionGrp) {
-	var tempSwatchesArray = loadProjectPalette();
+	var tempSwatchesArray = new loadProjectPalette().swatchesArray;
 
 	for (var s = 0; s < tempSwatchesArray.length; s++) {
 		var colorGrp = sectionGrp.add('group');
@@ -96,7 +96,16 @@ function sortPalette() {
 
 	try {
 		if (tempSwatchesArray.length > 0) {
-			mData.setProperty(schemaNS, propName, tempSwatchesArray.join('-'));
+			var tempDataArray = [];
+
+			for (var s = 0; s < tempSwatchesArray.length; s++) {
+				var tempColor = tempSwatchesArray[s].color;
+				var tempName = tempSwatchesArray[s].label;
+
+				tempItem = tempName == tempColor ? tempColor : tempColor + ':' + tempName;
+				tempDataArray.push(tempItem);
+			}
+			mData.setProperty(schemaNS, propName, tempDataArray.join('-'));
 		} else {
 			mData.deleteProperty(schemaNS, propName);
 		}
@@ -155,6 +164,7 @@ function setUiCtrlColor(ctrl, hex) {
 
 function colorSwatch(sectionGrp, swatchProperties) {
 	if (swatchProperties.index == undefined) swatchProperties.index = 0;
+	if (swatchProperties.label == undefined) swatchProperties.label = rgbToHEX(rgbArray);
 
 	var newUiCtrlObj = {};
 	var color = swatchProperties.color;
@@ -167,6 +177,7 @@ function colorSwatch(sectionGrp, swatchProperties) {
 	newUiCtrlObj.swatch.size = [swatchProperties.width, swatchProperties.height];
 	newUiCtrlObj.swatch.swatchColor = rgbArray;
 	newUiCtrlObj.swatch.index = swatchProperties.index;
+	newUiCtrlObj.swatch.label = swatchProperties.label;
 
 	drawColorSwatch(newUiCtrlObj.swatch, false);
 
@@ -238,9 +249,13 @@ function drawColorSwatch(button, hover) {
 		g.fillPath(fillBrush);
 		g.strokePath(pathPen);
 
-		if (!showLabels) return;
+		if (!showColorInfo && !showColorLabels) return;
 
-		var textLinesArray = this.text.split('\n');
+		var textLinesArray = [];
+
+		if (showColorLabels) textLinesArray.push(this.label.trim());
+		
+		if (this.label.trim() != this.text.trim()) textLinesArray = textLinesArray.concat(this.text.trim().split('\n'));
 
 		for (var l = 0; l < textLinesArray.length; l++) {
 			var px = 10;

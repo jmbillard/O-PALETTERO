@@ -77,12 +77,12 @@ var PAL_defaultPreferencesObj = {
 		},
 	],
 
-	showNames: false,
-	showLabels: true,
+	showColorLabels: false,
+	showColorInfo: true,
 	labelType: '#HEX',
 };
 
 var PAL_preferencesObj = loadDefaultPreferences();
-var showNames = PAL_preferencesObj.showNames;
-var showLabels = PAL_preferencesObj.showLabels;
+var showColorLabels = PAL_preferencesObj.showColorLabels;
+var showColorInfo = PAL_preferencesObj.showColorInfo;
 var labelType = PAL_preferencesObj.labelType;

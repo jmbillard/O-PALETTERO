@@ -52,8 +52,9 @@ function saveProjectPalette(sectionGrp) {
 		var colorGrp = sectionGrp.children[s];
 		var swatch = colorGrp.children[0];
 		var tempHEX = rgbToHEX(swatch.swatchColor);
+		var tempName = swatch.label;
 
-		tempSwatchesArray.push(tempHEX);
+		tempSwatchesArray.push(tempHEX + ':' + tempName);
 	}
 
 	var mData = new XMPMeta(app.project.xmpPacket);
@@ -77,28 +78,57 @@ function loadProjectPalette() {
 	var schemaNS = XMPMeta.getNamespaceURI('xmp');
 	var propName = 'xmp:Label';
 
-	var swatchesArray = [];
+	var data = {
+		swatchesArray: [],
+		labelsArray: []
+	};
 
 	for (var s = 0; s < PAL_preferencesObj.swatches.length; s++) {
 		if (!PAL_preferencesObj.swatches[s].hasOwnProperty('color')) continue;
 
-		swatchesArray.push(PAL_preferencesObj.swatches[s].color);
+		var tempColor = PAL_preferencesObj.swatches[s].color;
+		data.swatchesArray.push(tempColor);
+
+		if (!PAL_preferencesObj.swatches[s].hasOwnProperty('name')){
+
+			data.labelsArray.push(tempColor);
+		} else {
+			data.labelsArray.push(PAL_preferencesObj.swatches[s].label);
+		};
 	}
 
-	if (swatchesArray.length == 0) {
+	if (data.swatchesArray.length == 0) {
 		for (var s = 0; s < PAL_defaultPreferencesObj.swatches.length; s++) {
-			swatchesArray.push(PAL_defaultPreferencesObj.swatches[s].color);
+
+			var tempColor = PAL_defaultPreferencesObj.swatches[s].color;
+			var tempName = PAL_defaultPreferencesObj.swatches[s].label;
+			data.swatchesArray.push(tempColor);
+	
+			if (tempName.trim() == '') tempName = tempColor;
+			data.labelsArray.push(tempName);
 		}
 	}
 
 	try {
 		var propVal = mData.getProperty(schemaNS, propName);
-		var tempSwatchesArray = propVal.toString().split('-');
+		var tempData = {
+			swatchesArray: [],
+			labelsArray: []
+		};
 
-		if (tempSwatchesArray.length > 0) swatchesArray = tempSwatchesArray;
+		for (var s = 0; s < tempData.length; s++) {
+
+			var newData = swatchesArray[s].split(':');
+			var tempColor = newData[0];
+			var tempName = newData.length > 1 ? newData[1] : '';
+			tempData.swatchesArray.push(tempColor);
+			tempData.labelsArray.push(tempName);
+		}
+
+		if (tempData.swatchesArray.length > 0) data = tempData;
 	} catch (err) {}
 
-	return swatchesArray;
+	return data;
 }
 
 // ---------------------------------------------------------------------------------
@@ -123,7 +153,7 @@ function loadDefaultPreferences() {
 			tempPreferencesObj[o] = PAL_defaultPreferencesObj[o];
 		}
 	}
-	showLabels = tempPreferencesObj.showLabels;
+	showColorInfo = tempPreferencesObj.showColorInfo;
 	labelType = tempPreferencesObj.labelType;
 
 	return tempPreferencesObj;

@@ -139,14 +139,14 @@ function hexToHsl(hex) {
 	return [h, s, l];
 }
 
-function sortHex(colorArray) {
+function sortHex(data) {
 
 	var cArray = [];
 	var gArray = [];
 
 	for (var c = 0; c < colorArray.length; c++) {
 
-		var tempHsl = hexToHsl(colorArray[c]);
+		var tempHsl = hexToHsl(colorArray[c].color);
 
 		if (tempHsl[1] < 0.15) {
 			gArray.push(colorArray[c]);
@@ -157,8 +157,8 @@ function sortHex(colorArray) {
 
 	function compare(array) {
 		return array.sort(function (a, b) {
-			var hslA = hexToHsl(a);
-			var hslB = hexToHsl(b);
+			var hslA = hexToHsl(a.color);
+			var hslB = hexToHsl(b.color);
 
 			if (hslA[0] != hslB[0]) {
 
