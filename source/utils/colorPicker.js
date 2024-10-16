@@ -642,7 +642,7 @@
 		return defaultArr;
 	}
 
-	colorPicker.HexToRgb = function (hex) {
+	colorPicker.hexToRgb = function (hex) {
 		var ccolorhex = hex.toString(16);
 		ccolorb = parseInt(ccolorhex.substr(-2), 16);
 		ccolorg = parseInt(ccolorhex.substr(-4).substr(0, 2), 16);
@@ -893,7 +893,7 @@
 	}
 
 	colorPicker.parseHex = function (inputValue) {
-		return colorPicker.HexToRgb("0x" + inputValue);
+		return colorPicker.hexToRgb("0x" + inputValue);
 	}
 
 	colorPicker.parseShortHex = function (inputValue) {
@@ -901,7 +901,7 @@
 		var hex = "0x" + inputValue[0].toString() + inputValue[0].toString()
 			+ inputValue[1].toString() + inputValue[1].toString()
 			+ inputValue[2].toString() + inputValue[2].toString();
-		return colorPicker.HexToRgb(hex);
+		return colorPicker.hexToRgb(hex);
 	}
 
 	colorPicker.parseHsb = function (inputValue) {
