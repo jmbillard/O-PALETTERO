@@ -33,47 +33,47 @@ var PAL_defaultPreferencesObj = {
 	swatches: [
 		{
 			color: '#F13333',
-			label: '',
+			label: 'cor 1',
 		},
 		{
 			color: '#FF4D4D',
-			label: '',
+			label: 'cor 2',
 		},
 		{
 			color: '#FE674C',
-			label: '',
+			label: 'cor 3',
 		},
 		{
 			color: '#FF8F4D',
-			label: '',
+			label: 'cor 4',
 		},
 		{
 			color: '#FFC44E',
-			label: '',
+			label: 'cor 5',
 		},
 		{
 			color: '#5DE6A2',
-			label: '',
+			label: 'cor 6',
 		},
 		{
 			color: '#80C0FE',
-			label: '',
+			label: 'cor 7',
 		},
 		{
 			color: '#B5ADFF',
-			label: '',
+			label: 'cor 8',
 		},
 		{
 			color: '#FF8CCD',
-			label: '',
+			label: 'cor 9',
 		},
 		{
 			color: '#FF739A',
-			label: '',
+			label: 'cor 10',
 		},
 		{
 			color: '#FF5A68',
-			label: '',
+			label: 'cor 11',
 		},
 	],
 

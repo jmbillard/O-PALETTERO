@@ -4,7 +4,7 @@ function getPropertyColors(property, array) {
 	var excludeArray = [
 		'ADBE Material Options Group',
 		'ADBE Plane Options Group',
-		'ADBE Vector Materials Group',
+		'ADBE Vector Materials Group'
 	];
 
 	for (var i = 1; i <= property.numProperties; i++) {
@@ -89,21 +89,19 @@ function loadProjectPalette() {
 		var tempColor = PAL_preferencesObj.swatches[s].color;
 		data.swatchesArray.push(tempColor);
 
-		if (!PAL_preferencesObj.swatches[s].hasOwnProperty('name')){
-
+		if (!PAL_preferencesObj.swatches[s].hasOwnProperty('label')) {
 			data.labelsArray.push(tempColor);
 		} else {
 			data.labelsArray.push(PAL_preferencesObj.swatches[s].label);
-		};
+		}
 	}
 
 	if (data.swatchesArray.length == 0) {
 		for (var s = 0; s < PAL_defaultPreferencesObj.swatches.length; s++) {
-
 			var tempColor = PAL_defaultPreferencesObj.swatches[s].color;
 			var tempName = PAL_defaultPreferencesObj.swatches[s].label;
 			data.swatchesArray.push(tempColor);
-	
+
 			if (tempName.trim() == '') tempName = tempColor;
 			data.labelsArray.push(tempName);
 		}
@@ -111,14 +109,14 @@ function loadProjectPalette() {
 
 	try {
 		var propVal = mData.getProperty(schemaNS, propName);
+		var tempArray = propVal.toString().split('-');
 		var tempData = {
 			swatchesArray: [],
 			labelsArray: []
 		};
 
-		for (var s = 0; s < tempData.length; s++) {
-
-			var newData = swatchesArray[s].split(':');
+		for (var s = 0; s < tempArray.length; s++) {
+			var newData = tempArray[s].split(':');
 			var tempColor = newData[0];
 			var tempName = newData.length > 1 ? newData[1] : '';
 			tempData.swatchesArray.push(tempColor);

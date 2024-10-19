@@ -69,15 +69,19 @@ function buildColorGrp(colorGrp, color) {
 }
 
 function buildPalette(sectionGrp) {
-	var tempSwatchesArray = new loadProjectPalette().swatchesArray;
+
+	var palletObj = new loadProjectPalette();
+	var tempSwatchesArray = palletObj.swatchesArray;
+	var tempLabelsArray = palletObj.labelsArray;
+
+	// alert(tempSwatchesArray);
 
 	for (var s = 0; s < tempSwatchesArray.length; s++) {
 		var colorGrp = sectionGrp.add('group');
-		colorGrp.orientation = 'column';
-		colorGrp.spacing = 0;
 
 		var swatchProperties = {
 			color: tempSwatchesArray[s],
+			label: tempLabelsArray[s],
 			width: 40,
 			height: 18,
 			index: s
@@ -163,14 +167,14 @@ function setUiCtrlColor(ctrl, hex) {
 }
 
 function colorSwatch(sectionGrp, swatchProperties) {
-	if (swatchProperties.index == undefined) swatchProperties.index = 0;
-	if (swatchProperties.label == undefined) swatchProperties.label = rgbToHEX(rgbArray);
-
 	var newUiCtrlObj = {};
 	var color = swatchProperties.color;
-
+	
 	var isHEX = color.toString().match(/^#/);
 	var rgbArray = isHEX ? hexToRgb(color) : color;
+
+	if (swatchProperties.index == undefined) swatchProperties.index = 0;
+	if (swatchProperties.label == undefined) swatchProperties.label = '';
 
 	newUiCtrlObj.swatch = sectionGrp.add('customButton');
 	newUiCtrlObj.swatch.text = '';
@@ -212,10 +216,15 @@ function colorSwatch(sectionGrp, swatchProperties) {
 		var win = swatchesGrp.parent;
 
 		if (c.button == 2) {
+
+			var tempLabel = '';
+			var hasCustomLabel = this.label != rgbToHEX(this.swatchColor);
+			if (hasCustomLabel) tempLabel = this.label;
+
 			try {
 				if (!ScriptUI.environment.keyboardState.altKey) {
 					var newColor = new colorPicker(this.swatchColor);
-					new colorSwatch(colorGrp, { color: newColor });
+					new colorSwatch(colorGrp, { color: newColor, label: tempLabel });
 					colorGrp.remove(this);
 				} else {
 					swatchesGrp.remove(colorGrp);

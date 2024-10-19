@@ -152,15 +152,16 @@ function PAL_preferencesDialog() {
 		// setCtrlHighlight(downBtn, normalColor1, highlightColor1);
 
 
+		var colorGrp = swatchesGrp.add('group');
 		var swatchProperties = {
 			color: tempSwatchesArray[s],
-			name: tempLabelsArray[s],
+			label: tempLabelsArray[s],
 			width: 8,
 			height: 28,
 			noEvents: true,
 			index: s
 		};
-		var color = new colorSwatch(swatchesGrp, swatchProperties);
+		var color = new colorSwatch(colorGrp, swatchProperties);
 
 		// color.swatch.onClick = function () {
 		// 	var colorGrp = this.parent;
@@ -273,6 +274,7 @@ function PAL_preferencesDialog() {
 
 		this.text = tempName;
 		tempSelection.text = tempName;
+		swatchesGrp.children[tempSelection.index].children[0].label = tempName;
 		swatchList.active = true;
 	};
 
@@ -280,7 +282,7 @@ function PAL_preferencesDialog() {
 
 		// var colorGrp = this.parent;
 		var swatchesGrp = this.parent.children[0];
-		var swatch = swatchesGrp.children[this.selection.index];
+		var swatch = swatchesGrp.children[this.selection.index].children[0];
 		// swatchList.selection = null;
 		// swatchList.selection = [this.index];
 
@@ -293,11 +295,12 @@ function PAL_preferencesDialog() {
 			swatch.label = this.selection.text;
 			drawColorSwatch(swatch, false);
 
-		} catch (err) { alert(err.message); }
+		} catch (err) { }
 	};
 
 	save.button.onClick = function () {
 		saveProjectPalette(swatchesGrp);
+		PAL_prefW.close();
 	}
 	PAL_prefW.show();
 }
