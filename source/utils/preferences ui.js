@@ -12,6 +12,7 @@
 */
 
 function PAL_preferencesDialog() {
+
 	var scriptName = 'PREFERENCIAS';
 
 	var ckbGrpSpacing = 20;
@@ -31,16 +32,6 @@ function PAL_preferencesDialog() {
 	var themeHeaderLab = labelMainGrp.add('statictext', undefined, 'EXIBIR:');
 	setFgColor(themeHeaderLab, normalColor1);
 
-	var nameCkbGrp = labelMainGrp.add('group');
-	nameCkbGrp.spacing = ckbGrpSpacing;
-
-	var nameCkbLab = nameCkbGrp.add('statictext', undefined, 'nome personalizado');
-	nameCkbLab.helpTip = 'mostrar nomes na paleta principal';
-	nameCkbLab.preferredSize = txtSize;
-
-	var nameCkb = nameCkbGrp.add('checkbox', [8, 4, 24, 18]);
-	nameCkb.value = showColorLabels;
-
 	var labelCkbGrp = labelMainGrp.add('group');
 	labelCkbGrp.spacing = ckbGrpSpacing;
 
@@ -51,6 +42,18 @@ function PAL_preferencesDialog() {
 	var labelCkb = labelCkbGrp.add('checkbox', [8, 4, 24, 18]);
 	labelCkb.value = showColorInfo;
 
+	var nameCkbGrp = labelMainGrp.add('group');
+	nameCkbGrp.spacing = ckbGrpSpacing;
+
+	var nameCkbLab = nameCkbGrp.add('statictext', undefined, 'nome personalizado');
+	nameCkbLab.helpTip = 'mostrar nomes na paleta principal';
+	nameCkbLab.preferredSize = txtSize;
+	nameCkbLab.enabled = showColorInfo;
+
+	var nameCkb = nameCkbGrp.add('checkbox', [8, 4, 24, 18]);
+	nameCkb.value = showColorLabels;
+	nameCkb.enabled = showColorInfo;
+
 	var labelInfoGrp = labelMainGrp.add('group');
 	labelInfoGrp.spacing = 30;
 	labelInfoGrp.margins = [0, 8, 0, 4];
@@ -58,14 +61,17 @@ function PAL_preferencesDialog() {
 	var hexRdo = labelInfoGrp.add('radiobutton', undefined, '#HEX');
 	hexRdo.helpTip = 'código hexadecimal';
 	hexRdo.value = hexRdo.text == labelType;
+	hexRdo.enabled = showColorInfo;
 
 	var rgbRdo = labelInfoGrp.add('radiobutton', undefined, 'RGB');
 	rgbRdo.helpTip = 'valores RGB (red, green, blue)';
 	rgbRdo.value = rgbRdo.text == labelType;
+	rgbRdo.enabled = showColorInfo;
 
 	var hsbRdo = labelInfoGrp.add('radiobutton', undefined, 'HSB');
 	hsbRdo.helpTip = 'valores HSB (hue, saturation, brightness)';
 	hsbRdo.value = hsbRdo.text == labelType;
+	hsbRdo.enabled = showColorInfo;
 
 	//
 
@@ -236,6 +242,18 @@ function PAL_preferencesDialog() {
 
 	setBgColor(PAL_prefW, bgColor1);
 
+	function updateList(labelsArray) {
+
+		while (swatchList.items.length > 0) {
+			swatchList.remove(swatchList.items[0]);
+		}
+
+		for (var i = 0; i < labelsArray.length; i++) {
+
+			swatchList.add('item', labelsArray[i]);
+		}
+	}
+
 	hsbRdo.onClick = rgbRdo.onClick = hexRdo.onClick = function () {
 		labelType = this.text;
 		PAL_preferencesObj.labelType = this.text;
@@ -248,6 +266,12 @@ function PAL_preferencesDialog() {
 	labelCkb.onClick = function () {
 		showColorInfo = this.value;
 		PAL_preferencesObj.showColorInfo = this.value;
+
+		nameCkb.enabled = this.value;
+		nameCkbLab.enabled = this.value;
+		hexRdo.enabled = this.value;
+		rgbRdo.enabled = this.value;
+		hsbRdo.enabled = this.value;
 
 		saveDefaultPreferences();
 	};
@@ -269,13 +293,15 @@ function PAL_preferencesDialog() {
 
 	nameTxt.onEnterKey = nameTxt.onChange = function () {
 
-		var tempSelection = swatchList.selection;
+		var tempSelection = swatchList.selection.index;
 		var tempName = this.text.trim().replace(/[:\-\s]+/g, ' ');
 
 		this.text = tempName;
-		tempSelection.text = tempName;
-		swatchesGrp.children[tempSelection.index].children[0].label = tempName;
-		swatchList.active = true;
+		tempLabelsArray[tempSelection] = tempName;
+		updateList(tempLabelsArray);
+		swatchesGrp.children[tempSelection].children[0].label = tempName;
+		swatchList.selection = [tempSelection];
+		// swatchList.active = true;
 	};
 
 	swatchList.onDoubleClick = function () {

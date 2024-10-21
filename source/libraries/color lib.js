@@ -144,15 +144,15 @@ function sortHex(data) {
 	var cArray = [];
 	var gArray = [];
 
-	for (var c = 0; c < colorArray.length; c++) {
+	for (var c = 0; c < data.swatchesArray.length; c++) {
 
-		var tempHsl = hexToHsl(colorArray[c].color);
+		var tempHsl = hexToHsl(data.swatchesArray[c]);
 
 		if (tempHsl[1] < 0.15) {
-			gArray.push(colorArray[c]);
+			gArray.push({ color: data.swatchesArray[c], label: data.labelsArray[c] });
 			continue;
 		}
-		cArray.push(colorArray[c]);
+		cArray.push({ color: data.swatchesArray[c], label: data.labelsArray[c] });
 	}
 
 	function compare(array) {
@@ -175,7 +175,19 @@ function sortHex(data) {
 		});
 	}
 
-	return compare(cArray).concat(compare(gArray));
+	var sortedArray = compare(cArray).concat(compare(gArray));
+	var sortedData = {
+		swatchesArray: [],
+		labelsArray: []
+	}
+
+	for (var s = 0; s < sortedArray.length; s++) {
+
+		sortedData.swatchesArray.push(sortedArray[s].color);
+		sortedData.labelsArray.push(sortedArray[s].label);
+	}
+
+	return sortedData;
 }
 
 // Calcular a luminância relativa

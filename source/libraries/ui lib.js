@@ -92,19 +92,19 @@ function buildPalette(sectionGrp) {
 }
 
 function sortPalette() {
-	var tempSwatchesArray = sortHex(loadProjectPalette());
+	var tempData = sortHex(loadProjectPalette());
 
 	var mData = new XMPMeta(app.project.xmpPacket);
 	var schemaNS = XMPMeta.getNamespaceURI('xmp');
 	var propName = 'xmp:Label';
 
 	try {
-		if (tempSwatchesArray.length > 0) {
+		if (tempData.swatchesArray.length > 0) {
 			var tempDataArray = [];
 
-			for (var s = 0; s < tempSwatchesArray.length; s++) {
-				var tempColor = tempSwatchesArray[s].color;
-				var tempName = tempSwatchesArray[s].label;
+			for (var s = 0; s < tempData.swatchesArray.length; s++) {
+				var tempColor = tempData.swatchesArray[s];
+				var tempName = tempData.labelsArray[s];
 
 				tempItem = tempName == tempColor ? tempColor : tempColor + ':' + tempName;
 				tempDataArray.push(tempItem);
@@ -258,13 +258,9 @@ function drawColorSwatch(button, hover) {
 		g.fillPath(fillBrush);
 		g.strokePath(pathPen);
 
-		if (!showColorInfo && !showColorLabels) return;
+		if (!showColorInfo) return;
 
-		var textLinesArray = [];
-
-		if (showColorLabels) textLinesArray.push(this.label.trim());
-		
-		if (this.label.trim() != this.text.trim()) textLinesArray = textLinesArray.concat(this.text.trim().split('\n'));
+		var textLinesArray = this.text.split('\n');
 
 		for (var l = 0; l < textLinesArray.length; l++) {
 			var px = 10;
@@ -272,7 +268,7 @@ function drawColorSwatch(button, hover) {
 
 			if (appV > 24 && l == 0) py += 8;
 
-			g.drawString(textLinesArray[l], textPen, px, py);
+			g.drawString(textLinesArray[l].trim(), textPen, px, py);
 		}
 	};
 }

@@ -33,53 +33,53 @@ var PAL_defaultPreferencesObj = {
 	swatches: [
 		{
 			color: '#F13333',
-			label: 'cor 1',
+			label: 'cor 1'
 		},
 		{
 			color: '#FF4D4D',
-			label: 'cor 2',
+			label: 'cor 2'
 		},
 		{
 			color: '#FE674C',
-			label: 'cor 3',
+			label: 'cor 3'
 		},
 		{
 			color: '#FF8F4D',
-			label: 'cor 4',
+			label: 'cor 4'
 		},
 		{
 			color: '#FFC44E',
-			label: 'cor 5',
+			label: 'cor 5'
 		},
 		{
 			color: '#5DE6A2',
-			label: 'cor 6',
+			label: 'cor 6'
 		},
 		{
 			color: '#80C0FE',
-			label: 'cor 7',
+			label: 'cor 7'
 		},
 		{
 			color: '#B5ADFF',
-			label: 'cor 8',
+			label: 'cor 8'
 		},
 		{
 			color: '#FF8CCD',
-			label: 'cor 9',
+			label: 'cor 9'
 		},
 		{
 			color: '#FF739A',
-			label: 'cor 10',
+			label: 'cor 10'
 		},
 		{
 			color: '#FF5A68',
-			label: 'cor 11',
-		},
+			label: 'cor 11'
+		}
 	],
 
 	showColorLabels: false,
 	showColorInfo: true,
-	labelType: '#HEX',
+	labelType: '#HEX'
 };
 
 var PAL_preferencesObj = loadDefaultPreferences();
