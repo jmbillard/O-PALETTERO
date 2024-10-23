@@ -200,4 +200,15 @@ function saveTextFile(fileContent, filePath) {
 	return writeFileContent(newFile, fileContent);
 }
 
+// Abre um URL no navegador padrão do sistema operacional (Windows ou macOS).
+function openWebSite(url) {
+	if (appOs == 'Win') {
+		// Comando para abrir o URL no Windows Explorer (que também pode abrir URLs)
+		system.callSystem('explorer ' + url);
+	} else if (appOs == 'Mac') {
+		// Comando para abrir o URL no navegador padrão do macOS
+		system.callSystem('open ' + url);
+	}
+}
+
 // ---------------------------------------------------------------------------------

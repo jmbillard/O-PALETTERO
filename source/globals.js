@@ -1,7 +1,13 @@
 // Emojis e mensagens (opcional)
 var lol = 'Σ(っ °Д °;)っ        ';
 var relax = 'ヽ(✿ﾟ▽ﾟ)ノ        ';
+
+// Determina o sistema operacional atual
+var appOs = $.os.indexOf('Win') >= 0 ? 'Win' : 'Mac';
+
+// Versão do After Effects
 var appV = parseInt(app.buildName.substring(0, 2));
+var appFullV = app.buildName.split(/x/i)[0];
 
 var lClick = '◖   →  ';
 var rClick = ' ◗  →  ';
