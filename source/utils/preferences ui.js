@@ -24,12 +24,20 @@ function PAL_preferencesDialog() {
 	PAL_prefW.alignChildren = ['left', 'top'];
 	PAL_prefW.spacing = 16;
 
-	var labelMainGrp = PAL_prefW.add('group');
+	var preferencesGrp = PAL_prefW.add('group');
+	preferencesGrp.alignChildren = ['left', 'top'];
+
+	var preferencesVGrp1 = preferencesGrp.add('group');
+	preferencesVGrp1.orientation = 'column';
+	var preferencesVGrp2 = preferencesGrp.add('group');
+	preferencesVGrp2.orientation = 'column';
+
+	var labelMainGrp = preferencesVGrp1.add('group');
 	labelMainGrp.orientation = 'column';
 	labelMainGrp.alignChildren = ['left', 'center'];
 	labelMainGrp.spacing = 4;
 
-	var themeHeaderLab = labelMainGrp.add('statictext', undefined, 'EXIBIR:');
+	var themeHeaderLab = labelMainGrp.add('statictext', [0, 0, 60, 24], 'EXIBIR:');
 	setFgColor(themeHeaderLab, normalColor1);
 
 	var labelCkbGrp = labelMainGrp.add('group');
@@ -75,97 +83,39 @@ function PAL_preferencesDialog() {
 
 	//
 
-	new themeDivider(PAL_prefW);
+	// new themeDivider(preferencesVGrp1);
 
 	//
 
-	var colorsMainGrp = PAL_prefW.add('group');
+	var colorsMainGrp = preferencesVGrp2.add('group');
 	colorsMainGrp.orientation = 'column';
-	colorsMainGrp.alignChildren = ['left', 'center'];
+	colorsMainGrp.alignChildren = ['left', 'top'];
 	colorsMainGrp.spacing = 16;
 
-	var colorHeaderLab = colorsMainGrp.add('statictext', undefined, 'CORES:');
+	var colorHeaderLab = colorsMainGrp.add('statictext', [0, 0, 220, 24], 'CORES:');
 	setFgColor(colorHeaderLab, normalColor1);
 
 	var panel = colorsMainGrp.add('group');
 	panel.orientation = 'row';
-	panel.alignChildren = ['left','top'];
-	panel.spacing = 2;
-	panel.maximumSize.height = 240;
+	panel.alignChildren = ['left', 'top'];
+	panel.spacing = 8;
+	panel.minimumSize.height = 116;
+	panel.maximumSize.height = 326;
+
+	var scrollBar = panel.add('scrollbar');
 
 	var swatchesMainGrp = panel.add('group');
 	swatchesMainGrp.orientation = 'row';
 	swatchesMainGrp.spacing = 2;
 
-	var scrollBar = panel.add('scrollbar', [0, 0, 10, 240]);
-	// scrollBar.stepdelta = 10;
-
 	var swatchesGrp = swatchesMainGrp.add('group');
 	swatchesGrp.orientation = 'column';
-	swatchesGrp.spacing = 3;
-
-	// var ctrlGrp = swatchesMainGrp.add('group');
-	// ctrlGrp.orientation = 'column';
-	// ctrlGrp.spacing = 0;
+	swatchesGrp.spacing = 4;
 
 	var tempSwatchesArray = loadProjectPalette().swatchesArray;
 	var tempLabelsArray = loadProjectPalette().labelsArray;
-	// var swatchList = swatchesMainGrp.add(
-	// 	'listbox',
-	// 	[0, 0, 190, tempLabelsArray.length * 29 + 1],
-	// 	tempLabelsArray,
-	// 	// {
-	// 	// 	multiselect: true
-	// 	// numberOfColumns: 3,
-	// 	// showHeaders: true,
-	// 	// columnTitles: ["English", "French", "Dutch"],
-	// 	// columnWidths: [30,30,100]
-	// 	// }
-	// );
-	// swatchList.itemSize = [190, 28];
-
-	// var swatchesCtrlGrp = swatchesMainGrp.add('group');
-	// swatchesCtrlGrp.orientation = 'column';
-	// swatchesCtrlGrp.alignment = 'fill';
-	// swatchesCtrlGrp.spacing = 3;
-
-	// var upBtn = swatchesCtrlGrp.add('statictext', undefined, '▲');
-	// // var upBtn = swatchesCtrlGrp.add('statictext', undefined, '⤒');
-	// upBtn.justify = 'center';
-	// upBtn.alignment = ['center', 'top'];
-	// upBtn.preferredSize = [20, 20];
-	// upBtn.helpTip = lClick + 'subir cores selecionadas';
-	// setCtrlHighlight(upBtn, normalColor1, highlightColor1);
-
-	// var downBtn = swatchesCtrlGrp.add('statictext', undefined, '▼');
-	// // var upBtn = swatchesCtrlGrp.add('statictext', undefined, '⤒');
-	// downBtn.justify = 'center';
-	// downBtn.alignment = ['center', 'bottom'];
-	// downBtn.preferredSize = [20, 20];
-	// downBtn.helpTip = lClick + 'descer cores selecionadas';
-	// setCtrlHighlight(downBtn, normalColor1, highlightColor1);
 
 	for (var s = 0; s < tempSwatchesArray.length; s++) {
-
-		// var tempCtrlGrp = swatchesCtrlGrp.add('group');
-		// tempCtrlGrp.orientation = 'column';
-		// tempCtrlGrp.spacing = 0;
-
-		// var upBtn = tempCtrlGrp.add('statictext', undefined, '▲');
-		// // var upBtn = swatchesCtrlGrp.add('statictext', undefined, '⤒');
-		// upBtn.justify = 'center';
-		// upBtn.alignment = ['center', 'top'];
-		// upBtn.preferredSize = [20, 14];
-		// upBtn.helpTip = lClick + 'subir cores selecionadas';
-		// setCtrlHighlight(upBtn, normalColor1, highlightColor1);
-
-		// var downBtn = tempCtrlGrp.add('statictext', undefined, '▼');
-		// // var upBtn = swatchesCtrlGrp.add('statictext', undefined, '⤒');
-		// downBtn.justify = 'center';
-		// downBtn.alignment = ['center', 'bottom'];
-		// downBtn.preferredSize = [20, 14];
-		// downBtn.helpTip = lClick + 'descer cores selecionadas';
-		// setCtrlHighlight(downBtn, normalColor1, highlightColor1);
 
 		var colorGrp = swatchesGrp.add('group');
 		colorGrp.spacing = 8;
@@ -174,7 +124,7 @@ function PAL_preferencesDialog() {
 			color: tempSwatchesArray[s],
 			label: tempLabelsArray[s],
 			width: 8,
-			height: 24,
+			height: 26,
 			noEvents: true,
 			index: s
 		};
@@ -183,23 +133,32 @@ function PAL_preferencesDialog() {
 		txtGrp = colorGrp.add('group');
 		txtGrp.orientation = 'stack';
 
-		var colorNameLab = txtGrp.add('statictext', [0, 0, 164, 24], tempLabelsArray[s]);
+		var colorNameLab = txtGrp.add('statictext', [0, 0, 160, 26], tempLabelsArray[s]);
 		setCtrlHighlight(colorNameLab, monoColor0, highlightColor1);
 
-		var colorNameTxt = txtGrp.add('edittext', [0, 0, 164, 24], tempLabelsArray[s]);
+		var colorNameTxt = txtGrp.add('edittext', [0, 0, 160, 26], tempLabelsArray[s]);
 		colorNameTxt.visible = false;
 
-		var removeBtn = colorGrp.add('statictext', [0, 0, 10, 24], 'x');
+		var removeBtn = colorGrp.add('statictext', [0, 0, 8, 26], 'x');
 		setCtrlHighlight(removeBtn, normalColor1, highlightColor1);
 
-		removeBtn.addEventListener('click', function (c) {
+		removeBtn.addEventListener('click', function () {
 
 			this.parent.parent.remove(this.parent);
+
+			// colorHeaderLab.location = panel.children.length < 12 ? [14, 0] : [0, 0];
+			// scrollBar.size.width = panel.children.length < 12 ? 0 : 20;
+			if (panel.children.length < 11) {
+
+				panel.size.height -= 30;
+				// scrollBar.size.width = 0;
+				scrollBar.size.height = panel.size.height;
+			}
 			PAL_prefW.layout.layout(true);
-			scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;// + 35;
+			scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;
 		});
 
-		colorNameLab.addEventListener('click', function (c) {
+		colorNameLab.addEventListener('click', function () {
 
 			this.visible = false;
 			this.parent.children[1].text = this.text;
@@ -208,7 +167,7 @@ function PAL_preferencesDialog() {
 		});
 
 		colorNameTxt.onChange = colorNameTxt.onEnterKey = function () {
-			
+
 			this.visible = false;
 
 			this.parent.children[0].text = this.text;
@@ -224,40 +183,26 @@ function PAL_preferencesDialog() {
 			this.parent.children[0].text = this.text;
 			this.parent.children[0].visible = true;
 			this.parent.children[0].active = true;
-			
+
 			this.parent.parent.children[0].label = this.text;
 		});
 
-		// color.swatch.onClick = function () {
-		// 	var colorGrp = this.parent;
-		// 	var swatchesGrp = colorGrp.parent;
-		// 	swatchList.selection = null;
-		// 	swatchList.selection = [this.index];
+		color.swatch.onClick = function () {
+			var colorGrp = this.parent;
+			var swatchesGrp = colorGrp.parent;
 
-		// 	try {
-		// 		this.swatchColor = new colorPicker(this.swatchColor);
-		// 		swatchList.items[this.index].text = rgbToHEX(this.swatchColor);
-		// 		drawColorSwatch(this, false);
-		// 		saveProjectPalette(swatchesGrp);
-		// 	} catch (err) { }
-		// };
-
-		// color.swatch.addEventListener('mouseover', function () {
-		// 	swatchList.selection = null;
-		// 	swatchList.selection = [this.index];
-		// });
-
-		// color.swatch.addEventListener('mouseout', function () {
-		// 	swatchList.selection = null;
-		// });
+			try {
+				this.swatchColor = new colorPicker(this.swatchColor);
+				drawColorSwatch(this, false);
+				saveProjectPalette(swatchesGrp);
+			} catch (err) { }
+		};
 	}
-
-	// var nameTxt = PAL_prefW.add('edittext', [0, 0, 212, 32]);
 
 	var btnGrp = PAL_prefW.add('group');
 	btnGrp.orientation = 'stack';
 	btnGrp.alignment = 'fill';
-	btnGrp.margins = [0, 32, 0, 0]; // Margens do grupo de botões (15 pixels em cima)
+	btnGrp.margins = [0, 32, 0, 0];
 
 	var lBtnGrp = btnGrp.add('group');
 	lBtnGrp.alignment = 'left';
@@ -273,24 +218,6 @@ function PAL_preferencesDialog() {
 		height: 34
 	});
 
-	// var upBtn = new themeButton(rBtnGrp, {
-	// 	text: '▲',
-	// 	width: 40,
-	// 	height: 34
-	// });
-
-	// var downBtn = new themeButton(rBtnGrp, {
-	// 	text: '▼',
-	// 	width: 40,
-	// 	height: 34
-	// });
-
-	// var delBtn = new themeButton(rBtnGrp, {
-	// 	text: 'X',
-	// 	width: 40,
-	// 	height: 34
-	// });
-
 	var save = new themeButton(rBtnGrp, {
 		text: 'salvar paleta',
 		width: 100,
@@ -300,18 +227,6 @@ function PAL_preferencesDialog() {
 	});
 
 	setBgColor(PAL_prefW, bgColor1);
-
-	function updateList(labelsArray) {
-
-		while (swatchList.items.length > 0) {
-			swatchList.remove(swatchList.items[0]);
-		}
-
-		for (var i = 0; i < labelsArray.length; i++) {
-
-			swatchList.add('item', labelsArray[i]);
-		}
-	}
 
 	hsbRdo.onClick = rgbRdo.onClick = hexRdo.onClick = function () {
 		labelType = this.text;
@@ -323,21 +238,16 @@ function PAL_preferencesDialog() {
 	//---------------------------------------------------------
 
 	PAL_prefW.onShow = function () {
-		// Set various sizes and locations when the window is drawn
-		// panel.size.height = w.size.height;
-		// scrollBar.location = [505, 0];
-		scrollBar.size.width = 10;
-		scrollBar.size.height = panel.size.height;
-		scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;// + 35;
+		scrollBar.size.width = 20; //panel.children.length < 12 ? 0 : 20;
+		scrollBar.size.height = panel.size.height + 2;
+		scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;
+
+		this.layout.layout(true);
 	};
-	
+
 	scrollBar.onChanging = function () {
 		swatchesMainGrp.location.y = -1 * this.value;
 	}
-	
-	// swatchList.addEventListener('mouseover', function () {
-	// 	scrollBar.notify('onMouseOver');
-	// });
 
 	labelCkb.onClick = function () {
 		showColorInfo = this.value;
@@ -359,46 +269,9 @@ function PAL_preferencesDialog() {
 		saveDefaultPreferences();
 	};
 
-	// swatchList.onChange = function () {
-	// 	nameTxt.text = this.selection != null ? this.selection : '';
-	// };
-
 	cancel.button.onClick = function () {
 		PAL_prefW.close();
 	};
-
-	// nameTxt.onEnterKey = nameTxt.onChange = function () {
-
-	// 	var tempSelection = swatchList.selection.index;
-	// 	var tempName = this.text.trim().replace(/[:\-\s]+/g, ' ');
-
-	// 	this.text = tempName;
-	// 	tempLabelsArray[tempSelection] = tempName;
-	// 	updateList(tempLabelsArray);
-	// 	swatchesGrp.children[tempSelection].children[0].label = tempName;
-	// 	swatchList.selection = [tempSelection];
-	// 	// swatchList.active = true;
-	// };
-
-	// swatchList.onDoubleClick = function () {
-
-	// 	// var colorGrp = this.parent;
-	// 	var swatchesGrp = this.parent.children[0];
-	// 	var swatch = swatchesGrp.children[this.selection.index].children[0];
-	// 	// swatchList.selection = null;
-	// 	// swatchList.selection = [this.index];
-
-	// 	try {
-	// 		var tempName = this.selection.text;
-	// 		var isHex = tempName.length == 7 && tempName.match(/^#[A-F0-9]{6}/i);
-
-	// 		swatch.swatchColor = new colorPicker(swatch.swatchColor);
-	// 		this.selection.text = isHex ? rgbToHEX(swatch.swatchColor) : tempName;
-	// 		swatch.label = this.selection.text;
-	// 		drawColorSwatch(swatch, false);
-
-	// 	} catch (err) { }
-	// };
 
 	save.button.onClick = function () {
 		saveProjectPalette(swatchesGrp);

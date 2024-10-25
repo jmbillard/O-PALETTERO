@@ -60,7 +60,8 @@ function buildColorGrp(colorGrp, color) {
 	var swatchProperties = {
 		color: color,
 		width: 40,
-		height: 18
+		height: 18,
+		label: 'cor ' + colorGrp.parent.children.length
 	};
 
 	// for (var c = 0; c < tempArray.length; c++) {
@@ -78,12 +79,13 @@ function buildPalette(sectionGrp) {
 
 	for (var s = 0; s < tempSwatchesArray.length; s++) {
 		var colorGrp = sectionGrp.add('group');
+		colorGrp.alignment = 'fill';
 
 		var swatchProperties = {
 			color: tempSwatchesArray[s],
 			label: tempLabelsArray[s],
-			width: 40,
-			height: 18,
+			width: 64,
+			height: 64,
 			index: s
 		};
 
@@ -177,6 +179,7 @@ function colorSwatch(sectionGrp, swatchProperties) {
 	if (swatchProperties.label == undefined) swatchProperties.label = '';
 
 	newUiCtrlObj.swatch = sectionGrp.add('customButton');
+	newUiCtrlObj.swatch.alignment = 'fill';
 	newUiCtrlObj.swatch.text = '';
 	newUiCtrlObj.swatch.size = [swatchProperties.width, swatchProperties.height];
 	newUiCtrlObj.swatch.swatchColor = rgbArray;
@@ -217,17 +220,15 @@ function colorSwatch(sectionGrp, swatchProperties) {
 
 		if (c.button == 2) {
 
-			var tempLabel = '';
-			var hasCustomLabel = this.label != rgbToHEX(this.swatchColor);
-			if (hasCustomLabel) tempLabel = this.label;
+			var tempLabel = this.label;
 
 			try {
-				if (!ScriptUI.environment.keyboardState.altKey) {
+				if (ScriptUI.environment.keyboardState.altKey) {
+					swatchesGrp.remove(colorGrp);
+				} else {
 					var newColor = new colorPicker(this.swatchColor);
 					new colorSwatch(colorGrp, { color: newColor, label: tempLabel });
 					colorGrp.remove(this);
-				} else {
-					swatchesGrp.remove(colorGrp);
 				}
 				saveProjectPalette(swatchesGrp);
 				PAL_layout(win);
