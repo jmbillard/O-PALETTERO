@@ -12,10 +12,9 @@
 */
 
 function PAL_preferencesDialog() {
-
 	var scriptName = 'PREFERENCIAS';
 
-	var ckbGrpSpacing = 20;
+	var ckbGrpSpacing = 16;
 	var txtSize = [150, 30];
 
 	//---------------------------------------------------------
@@ -29,16 +28,25 @@ function PAL_preferencesDialog() {
 
 	var preferencesVGrp1 = preferencesGrp.add('group');
 	preferencesVGrp1.orientation = 'column';
+	preferencesVGrp1.alignChildren = ['left', 'top'];
+
+	//
+
+	new themeDivider(preferencesGrp);
+
+	//
+
 	var preferencesVGrp2 = preferencesGrp.add('group');
 	preferencesVGrp2.orientation = 'column';
+	preferencesVGrp2.alignChildren = ['left', 'top'];
 
 	var labelMainGrp = preferencesVGrp1.add('group');
 	labelMainGrp.orientation = 'column';
 	labelMainGrp.alignChildren = ['left', 'center'];
 	labelMainGrp.spacing = 4;
 
-	var themeHeaderLab = labelMainGrp.add('statictext', [0, 0, 60, 24], 'EXIBIR:');
-	setFgColor(themeHeaderLab, normalColor1);
+	var showHeaderLab = labelMainGrp.add('statictext', [0, 0, 60, 24], 'EXIBIR:');
+	setFgColor(showHeaderLab, normalColor1);
 
 	var labelCkbGrp = labelMainGrp.add('group');
 	labelCkbGrp.spacing = ckbGrpSpacing;
@@ -83,7 +91,34 @@ function PAL_preferencesDialog() {
 
 	//
 
-	// new themeDivider(preferencesVGrp1);
+	new themeDivider(preferencesVGrp1);
+
+	//
+
+	var paletteMainGrp = preferencesVGrp1.add('group');
+	paletteMainGrp.orientation = 'column';
+	paletteMainGrp.alignChildren = ['left', 'center'];
+	paletteMainGrp.spacing = 4;
+
+	var paletteHeaderLab = paletteMainGrp.add('statictext', [0, 0, 56, 24], 'PALETA:');
+	setFgColor(paletteHeaderLab, normalColor1);
+
+	var defaultPaletteGrp = paletteMainGrp.add('group');
+	defaultPaletteGrp.spacing = 10;
+
+	var defaultPaletteLab = defaultPaletteGrp.add(
+		'statictext',
+		undefined,
+		'definir como paleta padrão'
+	);
+	defaultPaletteLab.helpTip = 'salva a lista de cores exibida ao lado como a paleta padrão';
+	defaultPaletteLab.preferredSize = txtSize;
+
+	var defaultPaletteBtn = new themeButton(defaultPaletteGrp, {
+		text: '...',
+		width: 40,
+		height: 34
+	});
 
 	//
 
@@ -92,31 +127,33 @@ function PAL_preferencesDialog() {
 	colorsMainGrp.alignChildren = ['left', 'top'];
 	colorsMainGrp.spacing = 16;
 
-	var colorHeaderLab = colorsMainGrp.add('statictext', [0, 0, 220, 24], 'CORES:');
+	var colorHeaderLabGrp = colorsMainGrp.add('group');
+	colorHeaderLabGrp.margins = [28, 0, 0, 0];
+	var colorHeaderLab = colorHeaderLabGrp.add('statictext', [0, 0, 172, 24], 'CORES:');
 	setFgColor(colorHeaderLab, normalColor1);
+
+	var addBtn = colorHeaderLabGrp.add('statictext', undefined, '+');
+	addBtn.size = [24, 24];
+	setCtrlHighlight(addBtn, normalColor1, highlightColor1);
 
 	var panel = colorsMainGrp.add('group');
 	panel.orientation = 'row';
 	panel.alignChildren = ['left', 'top'];
 	panel.spacing = 8;
-	panel.minimumSize.height = 116;
+	panel.preferredSize.height = 326;
 	panel.maximumSize.height = 326;
 
 	var scrollBar = panel.add('scrollbar');
 
-	var swatchesMainGrp = panel.add('group');
-	swatchesMainGrp.orientation = 'row';
-	swatchesMainGrp.spacing = 2;
-
-	var swatchesGrp = swatchesMainGrp.add('group');
+	var swatchesGrp = panel.add('group');
 	swatchesGrp.orientation = 'column';
 	swatchesGrp.spacing = 4;
+	swatchesGrp.preferredSize.height = 326;
 
 	var tempSwatchesArray = loadProjectPalette().swatchesArray;
 	var tempLabelsArray = loadProjectPalette().labelsArray;
 
 	for (var s = 0; s < tempSwatchesArray.length; s++) {
-
 		var colorGrp = swatchesGrp.add('group');
 		colorGrp.spacing = 8;
 
@@ -143,23 +180,13 @@ function PAL_preferencesDialog() {
 		setCtrlHighlight(removeBtn, normalColor1, highlightColor1);
 
 		removeBtn.addEventListener('click', function () {
-
 			this.parent.parent.remove(this.parent);
 
-			// colorHeaderLab.location = panel.children.length < 12 ? [14, 0] : [0, 0];
-			// scrollBar.size.width = panel.children.length < 12 ? 0 : 20;
-			if (panel.children.length < 11) {
-
-				panel.size.height -= 30;
-				// scrollBar.size.width = 0;
-				scrollBar.size.height = panel.size.height;
-			}
 			PAL_prefW.layout.layout(true);
 			scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;
 		});
 
 		colorNameLab.addEventListener('click', function () {
-
 			this.visible = false;
 			this.parent.children[1].text = this.text;
 			this.parent.children[1].visible = true;
@@ -167,7 +194,7 @@ function PAL_preferencesDialog() {
 		});
 
 		colorNameTxt.onChange = colorNameTxt.onEnterKey = function () {
-
+			this.text = this.text.replace(/[\:\-]/g, ' ');
 			this.visible = false;
 
 			this.parent.children[0].text = this.text;
@@ -175,9 +202,10 @@ function PAL_preferencesDialog() {
 			this.parent.children[0].active = true;
 
 			this.parent.parent.children[0].label = this.text;
-		}
+		};
 
 		colorNameTxt.addEventListener('blur', function () {
+			this.text = this.text.replace(/[\:\-]/g, ' ');
 			this.visible = false;
 
 			this.parent.children[0].text = this.text;
@@ -195,7 +223,7 @@ function PAL_preferencesDialog() {
 				this.swatchColor = new colorPicker(this.swatchColor);
 				drawColorSwatch(this, false);
 				saveProjectPalette(swatchesGrp);
-			} catch (err) { }
+			} catch (err) {}
 		};
 	}
 
@@ -220,7 +248,7 @@ function PAL_preferencesDialog() {
 
 	var save = new themeButton(rBtnGrp, {
 		text: 'salvar paleta',
-		width: 100,
+		width: 50,
 		height: 34,
 		buttonColor: normalColor1,
 		textColor: bgColor1
@@ -228,26 +256,118 @@ function PAL_preferencesDialog() {
 
 	setBgColor(PAL_prefW, bgColor1);
 
-	hsbRdo.onClick = rgbRdo.onClick = hexRdo.onClick = function () {
-		labelType = this.text;
-		PAL_preferencesObj.labelType = this.text;
+	hsbRdo.onClick =
+		rgbRdo.onClick =
+		hexRdo.onClick =
+			function () {
+				labelType = this.text;
+				PAL_preferencesObj.labelType = this.text;
 
-		saveDefaultPreferences();
-	};
+				saveDefaultPreferences();
+			};
 
 	//---------------------------------------------------------
 
 	PAL_prefW.onShow = function () {
-		scrollBar.size.width = 20; //panel.children.length < 12 ? 0 : 20;
-		scrollBar.size.height = panel.size.height + 2;
+		scrollBar.size.width = 20;
+		scrollBar.size.height = panel.size.height;
 		scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;
 
 		this.layout.layout(true);
 	};
 
 	scrollBar.onChanging = function () {
-		swatchesMainGrp.location.y = -1 * this.value;
-	}
+		swatchesGrp.location.y = -1 * this.value;
+	};
+
+	addBtn.addEventListener('click', function (c) {
+		if (c.button == 0) {
+			try {
+				var colorGrp = swatchesGrp.add('group');
+				colorGrp.spacing = 8;
+
+				var swatchProperties = {
+					color: new colorPicker(),
+					label: 'cor ' + swatchesGrp.children.length,
+					width: 8,
+					height: 26,
+					noEvents: true,
+					index: swatchesGrp.children.length
+				};
+				var color = new colorSwatch(colorGrp, swatchProperties);
+
+				txtGrp = colorGrp.add('group');
+				txtGrp.orientation = 'stack';
+
+				var colorNameLab = txtGrp.add(
+					'statictext',
+					[0, 0, 160, 26],
+					swatchProperties.label
+				);
+				setCtrlHighlight(colorNameLab, monoColor0, highlightColor1);
+
+				var colorNameTxt = txtGrp.add('edittext', [0, 0, 160, 26], swatchProperties.label);
+				colorNameTxt.visible = false;
+
+				var removeBtn = colorGrp.add('statictext', [0, 0, 8, 26], 'x');
+				setCtrlHighlight(removeBtn, normalColor1, highlightColor1);
+
+				removeBtn.addEventListener('click', function () {
+					this.parent.parent.remove(this.parent);
+
+					PAL_prefW.layout.layout(true);
+					scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;
+				});
+
+				colorNameLab.addEventListener('click', function () {
+					this.visible = false;
+					this.parent.children[1].text = this.text;
+					this.parent.children[1].visible = true;
+					this.parent.children[1].active = true;
+				});
+
+				colorNameTxt.onChange = colorNameTxt.onEnterKey = function () {
+					this.text = this.text.replace(/[\:\-]/g, ' ');
+					this.visible = false;
+
+					this.parent.children[0].text = this.text;
+					this.parent.children[0].visible = true;
+					this.parent.children[0].active = true;
+
+					this.parent.parent.children[0].label = this.text;
+				};
+
+				colorNameTxt.addEventListener('blur', function () {
+					this.text = this.text.replace(/[\:\-]/g, ' ');
+					this.visible = false;
+
+					this.parent.children[0].text = this.text;
+					this.parent.children[0].visible = true;
+					this.parent.children[0].active = true;
+
+					this.parent.parent.children[0].label = this.text;
+				});
+
+				color.swatch.onClick = function () {
+					var colorGrp = this.parent;
+					var swatchesGrp = colorGrp.parent;
+
+					try {
+						this.swatchColor = new colorPicker(this.swatchColor);
+						drawColorSwatch(this, false);
+						saveProjectPalette(swatchesGrp);
+					} catch (err) {}
+				};
+				PAL_prefW.layout.layout(true);
+
+				if (swatchesGrp.children.length > 11) {
+					scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;
+					scrollBar.value = scrollBar.maxvalue;
+					swatchesGrp.location.y = -1 * scrollBar.value;
+				}
+			} catch (err) {}
+		}
+	});
 
 	labelCkb.onClick = function () {
 		showColorInfo = this.value;
@@ -269,13 +389,32 @@ function PAL_preferencesDialog() {
 		saveDefaultPreferences();
 	};
 
+	defaultPaletteBtn.button.onClick = function () {
+		var defaultSwatchesArray = [];
+
+		for (var s = 0; s < swatchesGrp.children.length; s++) {
+			var tempItem = {
+				color: rgbToHEX(swatchesGrp.children[s].children[0].swatchColor),
+				label: swatchesGrp.children[s].children[0].label
+			};
+			defaultSwatchesArray.push(tempItem);
+		}
+		PAL_preferencesObj.swatches = defaultSwatchesArray;
+
+		saveDefaultPreferences();
+		this.text = '✓';
+	};
+
 	cancel.button.onClick = function () {
 		PAL_prefW.close();
 	};
 
 	save.button.onClick = function () {
 		saveProjectPalette(swatchesGrp);
+
 		PAL_prefW.close();
-	}
+	};
 	PAL_prefW.show();
+
+	return swatchesGrp.children.length;
 }

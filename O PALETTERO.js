@@ -4,7 +4,7 @@
 function O_PALETTERO_UTL(thisObj) {
 
 	var scriptName = 'O PALETTERO';
-	var scriptVersion = 'v0.1b';
+	var scriptVersion = 'v0.2b';
 
 	#include 'source/libraries/JSON lib.js';
 	#include 'source/libraries/color lib.js';

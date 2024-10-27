@@ -26,3 +26,15 @@ if (!Array.prototype.indexOf) {
 		return -1;
 	};
 }
+
+if (!Array.prototype.pop) {
+	Array.prototype.pop = function () {
+		if (this.length == 0) {
+			return undefined;
+		}
+		var lastElement = this[this.length - 1];
+		this.length--; // Reduz o tamanho do array
+		return lastElement;
+	};
+}
+

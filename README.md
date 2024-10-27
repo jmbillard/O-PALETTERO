@@ -3,7 +3,7 @@
 🗨️ **pt-BR** ⚡ uma paleta de cores simples para o After Effects ⚡
 
 > 📂 **arquivos:**\
-> • **O PALETEIRO beta.jsx** → aquivo que deve ser executado no after effects.\
+> • **O PALETEIRO beta.jsx** → aquivo que deve ser executado ou instalado no after effects.\
 > • **O_PALETTERO_SOURCE_beta.jsxbin** → arquivo que contém o binário do script.
 
 esse script ainda está em fase *beta*, então, em caso de bugs, sugestões e ajuda, é só chamar...
@@ -18,11 +18,7 @@ esse script ainda está em fase *beta*, então, em caso de bugs, sugestões e aj
 >
 > ![ui](docs/images/ui_1.png)
 
-<br>
-
-> 📟 *interface do editor de cores:*
->
-> ![ui](docs/images/ui_2.png)
+a interface é responsiva e exibirá todas as informações da forma mais eficiente possível.
 
 - **botão +**:\
 `◖ clique esquerdo` → adiciona um nova cor.\
@@ -34,14 +30,14 @@ esse script ainda está em fase *beta*, então, em caso de bugs, sugestões e aj
 
 <br><br>
 
-- **botão ⟲**:\
+- **botão ⇅**:\
 `◖ clique esquerdo` → puxa a paleta do projeto.\
 `◗ clique direito` → ordena a paleta, usando os critérios: *1 - matiz*, *2 - brilho*, *3 - saturação*.
   >
 
 > 🚩 *obs:*\
 > • as paletas são salvas dentro dos metadados do projeto.\
-> • caso não exista nenhuma paleta salva no projeto, o botão ⟲ puxará as cores iniciais.
+> • caso não exista nenhuma paleta salva no projeto, as cores iniciais serão puxadas.
 
 <br><br>
 
@@ -50,3 +46,59 @@ esse script ainda está em fase *beta*, então, em caso de bugs, sugestões e aj
 `◗ clique direito` → editar a cor clicada.\
 `Alt + ◗ clique direito` → excluir a cor clicada.
   >
+
+<br>
+
+---
+
+<br>
+
+> 📟 *interface do editor de cores:*
+>
+> ![ui](docs/images/ui_2.png)
+
+- **cancelar**:\
+`◖ clique esquerdo` → cancela a alteração ou adição da cor atual.
+
+- **aplicar**:\
+`◖ clique esquerdo` → aplica a alteração ou adição da cor atual.
+
+<br>
+
+---
+
+<br>
+
+> 📟 *interface do editor de cores:*
+>
+> ![ui](docs/images/ui_3.png)
+
+**EXIBIR**:
+
+- **informação de cor** → habilita / desabilita a exibição de textos nas amostras de cor.
+- **nome personalizado** → habilita / desabilita a exibição do nome da cor.
+- **#HEX**, **RGB**, **HSB** → exibem seus respectivos valores nas amostras de cor.
+
+> 🚩 *obs:*\
+> • as alterações feitas nessa seção são salvas automaticamente.
+
+<br><br>
+
+**CORES**:
+
+- **botões de cor** → editar a cor clicada.
+- **nomes de cor** → editar o nome clicado.
+- **X** → remove a cor da lista.
+
+> 🚩 *obs:*\
+> • as alterações feitas nessa seção só serão salvas após clicar no botão '*salvar paleta*'.
+
+<br><br>
+
+**BOTÕES**:
+
+- **cancelar**:\
+`◖ clique esquerdo` → cancela o salvamento da paleta no projeto.
+
+- **salvar paleta**:\
+`◖ clique esquerdo` → salva a paleta no projeto.
