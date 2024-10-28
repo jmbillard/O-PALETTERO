@@ -31,7 +31,7 @@ function drawThemeButton(button) {
 	var g = button.graphics;
 	var textPen = g.newPen(g.PenType.SOLID_COLOR, button.textColor, 1);
 	var fillBrush = g.newBrush(g.BrushType.SOLID_COLOR, button.buttonColor);
-	var btnMargin = 10;
+	var margin = 10;
 
 	button.onDraw = function () {
 		var h = this.size.height;
@@ -43,7 +43,7 @@ function drawThemeButton(button) {
 		g.fillPath(fillBrush);
 
 		if (this.text.trim() == '') return;
-		if (w < swatchMargin * 2 + 6) return;
+		if (w < margin * 2 + 6) return;
 
 		var textLinesArray = this.text.split('\n');
 		var pyInc = 12;
@@ -51,10 +51,10 @@ function drawThemeButton(button) {
 		for (var l = 0; l < textLinesArray.length; l++) {
 			var txtW = g.measureString(textLinesArray[l]).width;
 
-			if (txtW > w - btnMargin * 2) {
+			if (txtW > w - margin * 2) {
 				textLinesArray[l] = textLinesArray[l].substring(0, textLinesArray[l].length - 2);
 
-				while (txtW > w - 6 - btnMargin * 2) {
+				while (txtW > w - 6 - margin * 2) {
 					var end = textLinesArray[l].length - 1;
 					textLinesArray[l] = textLinesArray[l].substring(0, end);
 
@@ -256,7 +256,7 @@ function colorSwatch(sectionGrp, swatchProperties) {
 
 function drawColorSwatch(button, hover) {
 	var isDark = luminance(button.swatchColor) < 0.4;
-	var swatchMargin = 10;
+	var margin = 10;
 
 	var textColor = isDark ? [1, 1, 1, 0.5] : [0, 0, 0, 0.5];
 
@@ -277,7 +277,7 @@ function drawColorSwatch(button, hover) {
 
 		if (!showColorInfo) return;
 		if (this.text.trim() == '') return;
-		if (w < swatchMargin * 2 + 6) return;
+		if (w < margin * 2 + 6) return;
 
 		var textLinesArray = this.text.split('\n');
 
@@ -285,10 +285,10 @@ function drawColorSwatch(button, hover) {
 
 			var txtW = g.measureString(textLinesArray[l]).width;
 
-			if (txtW > w - swatchMargin * 2) {
+			if (txtW > w - margin * 2) {
 				textLinesArray[l] = textLinesArray[l].substring(0, textLinesArray[l].length - 2);
 
-				while (txtW > w - 6 - swatchMargin * 2) {
+				while (txtW > w - 6 - margin * 2) {
 					var end = textLinesArray[l].length - 1;
 					textLinesArray[l] = textLinesArray[l].substring(0, end);
 
@@ -296,7 +296,7 @@ function drawColorSwatch(button, hover) {
 				}
 				textLinesArray[l] += '...';
 			}
-			var px = swatchMargin;
+			var px = margin;
 			var py = l == 0 ? 2 : (py += 16);
 
 			if (appV > 24 && l == 0) py += 8;

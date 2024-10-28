@@ -248,7 +248,7 @@ function PAL_preferencesDialog() {
 
 	var save = new themeButton(rBtnGrp, {
 		text: 'salvar paleta',
-		width: 50,
+		width: 100,
 		height: 34,
 		buttonColor: normalColor1,
 		textColor: bgColor1
