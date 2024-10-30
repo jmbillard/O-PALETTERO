@@ -1,3 +1,32 @@
+
+// Obtém um array com todas as composições (CompItem) do projeto atual.
+function getComps() {
+	var compArray = []; // Array para armazenar as composições
+
+	// Itera sobre os itens do projeto
+	for (var i = 1; i <= app.project.numItems; i++) {
+		var comp = app.project.item(i); // Obtém o item atual
+
+		// Verifica se o item é uma composição (CompItem)
+		if (comp instanceof CompItem) compArray.push(comp); // Adiciona a composição ao array
+	}
+
+	return compArray; // Retorna o array de composições
+}
+
+function getLayers(compArray) {
+	var layerArray = [];
+
+	for (var c = 0; c < compArray.length; c++) {
+		var comp = compArray[c];
+
+		for (var l = 1; l <= comp.numLayers; l++) {
+			layerArray.push(comp.layer(l));
+		}
+	}
+	return layerArray;
+}
+
 // ---------------------------------------------------------------------------------
 
 function getPropertyColors(property, array) {

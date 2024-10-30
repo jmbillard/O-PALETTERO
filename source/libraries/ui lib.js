@@ -31,7 +31,7 @@ function drawThemeButton(button) {
 	var g = button.graphics;
 	var textPen = g.newPen(g.PenType.SOLID_COLOR, button.textColor, 1);
 	var fillBrush = g.newBrush(g.BrushType.SOLID_COLOR, button.buttonColor);
-	var margin = 10;
+	var margin = 6;
 
 	button.onDraw = function () {
 		var h = this.size.height;
@@ -106,6 +106,85 @@ function buildPalette(sectionGrp) {
 
 		new colorSwatch(colorGrp, swatchProperties);
 	}
+}
+
+function swatchListItem(swatchesGrp, swatchColor, colorLabel) {
+
+	var colorGrp = swatchesGrp.add('group');
+	colorGrp.spacing = 8;
+
+	var swatchProperties = {
+		color: swatchColor,
+		label: colorLabel,
+		width: 8,
+		height: 26,
+		noEvents: true,
+		index: swatchesGrp.children.length
+	};
+	var color = new colorSwatch(colorGrp, swatchProperties);
+
+	txtGrp = colorGrp.add('group');
+	txtGrp.orientation = 'stack';
+
+	var colorNameLab = txtGrp.add('statictext', [0, 0, 160, 26], swatchProperties.label);
+	setCtrlHighlight(colorNameLab, monoColor0, highlightColor1);
+
+	var colorNameTxt = txtGrp.add('edittext', [0, 0, 160, 26], swatchProperties.label);
+	colorNameTxt.visible = false;
+
+	var removeBtn = colorGrp.add('statictext', [0, 0, 8, 26], 'x');
+	setCtrlHighlight(removeBtn, normalColor1, highlightColor1);
+
+	removeBtn.addEventListener('click', function () {
+		var colorGrp = this.parent;
+		var swatchesGrp = colorGrp.parent;
+		var panel = swatchesGrp.parent;
+
+		swatchesGrp.remove(colorGrp);
+
+		panel.layout.layout(true);
+		panel.children[0].maxvalue = swatchesGrp.size.height - panel.size.height;
+	});
+
+	colorNameLab.addEventListener('click', function () {
+		this.visible = false;
+		this.parent.children[1].text = this.text;
+		this.parent.children[1].visible = true;
+		this.parent.children[1].active = true;
+	});
+
+	colorNameTxt.onChange = colorNameTxt.onEnterKey = function () {
+		this.text = this.text.replace(/[\:\-]/g, ' ');
+		this.visible = false;
+
+		this.parent.children[0].text = this.text;
+		this.parent.children[0].visible = true;
+		this.parent.children[0].active = true;
+
+		this.parent.parent.children[0].label = this.text;
+	};
+
+	colorNameTxt.addEventListener('blur', function () {
+		this.text = this.text.replace(/[\:\-]/g, ' ');
+		this.visible = false;
+
+		this.parent.children[0].text = this.text;
+		this.parent.children[0].visible = true;
+		this.parent.children[0].active = true;
+
+		this.parent.parent.children[0].label = this.text;
+	});
+
+	color.swatch.onClick = function () {
+		var colorGrp = this.parent;
+		var swatchesGrp = colorGrp.parent;
+
+		try {
+			this.swatchColor = new colorPicker(this.swatchColor);
+			drawColorSwatch(this, false);
+			// saveProjectPalette(swatchesGrp);
+		} catch (err) { }
+	};
 }
 
 function sortPalette() {
@@ -247,7 +326,7 @@ function colorSwatch(sectionGrp, swatchProperties) {
 				}
 				saveProjectPalette(swatchesGrp);
 				PAL_layout(win);
-			} catch (err) {}
+			} catch (err) { }
 		}
 	});
 
@@ -256,7 +335,7 @@ function colorSwatch(sectionGrp, swatchProperties) {
 
 function drawColorSwatch(button, hover) {
 	var isDark = luminance(button.swatchColor) < 0.4;
-	var margin = 10;
+	var margin = 6;
 
 	var textColor = isDark ? [1, 1, 1, 0.5] : [0, 0, 0, 0.5];
 

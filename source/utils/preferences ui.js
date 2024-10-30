@@ -143,9 +143,18 @@ function PAL_preferencesDialog() {
 	setFgColor(colorHeaderLab, normalColor1);
 
 	var refreshBtn = colorHeaderLabGrp.add('statictext', [0, 0, 24, 24], '⇅');
+	refreshBtn.helpTip = [
+		lClick + 'puxar paleta',
+		rClick + 'ordenar paleta',
+		'',
+		'Alt  + ' + rClick + 'zerar paleta'
+	].join('\n');
 	setCtrlHighlight(refreshBtn, normalColor1, highlightColor1);
 
 	var addBtn = colorHeaderLabGrp.add('statictext', [0, 0, 24, 24], '+');
+	addBtn.helpTip = [
+		lClick + 'adicionar uma nova cor',
+	].join('\n');
 	setCtrlHighlight(addBtn, normalColor1, highlightColor1);
 
 	var panel = colorsMainGrp.add('group');
@@ -166,77 +175,7 @@ function PAL_preferencesDialog() {
 	var tempLabelsArray = loadProjectPalette().labelsArray;
 
 	for (var s = 0; s < tempSwatchesArray.length; s++) {
-		var colorGrp = swatchesGrp.add('group');
-		colorGrp.spacing = 8;
-
-		var swatchProperties = {
-			color: tempSwatchesArray[s],
-			label: tempLabelsArray[s],
-			width: 8,
-			height: 26,
-			noEvents: true,
-			index: s
-		};
-		var color = new colorSwatch(colorGrp, swatchProperties);
-
-		txtGrp = colorGrp.add('group');
-		txtGrp.orientation = 'stack';
-
-		var colorNameLab = txtGrp.add('statictext', [0, 0, 160, 26], tempLabelsArray[s]);
-		setCtrlHighlight(colorNameLab, monoColor0, highlightColor1);
-
-		var colorNameTxt = txtGrp.add('edittext', [0, 0, 160, 26], tempLabelsArray[s]);
-		colorNameTxt.visible = false;
-
-		var removeBtn = colorGrp.add('statictext', [0, 0, 8, 26], 'x');
-		setCtrlHighlight(removeBtn, normalColor1, highlightColor1);
-
-		removeBtn.addEventListener('click', function () {
-			this.parent.parent.remove(this.parent);
-
-			PAL_prefW.layout.layout(true);
-			scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;
-		});
-
-		colorNameLab.addEventListener('click', function () {
-			this.visible = false;
-			this.parent.children[1].text = this.text;
-			this.parent.children[1].visible = true;
-			this.parent.children[1].active = true;
-		});
-
-		colorNameTxt.onChange = colorNameTxt.onEnterKey = function () {
-			this.text = this.text.replace(/[\:\-]/g, ' ');
-			this.visible = false;
-
-			this.parent.children[0].text = this.text;
-			this.parent.children[0].visible = true;
-			this.parent.children[0].active = true;
-
-			this.parent.parent.children[0].label = this.text;
-		};
-
-		colorNameTxt.addEventListener('blur', function () {
-			this.text = this.text.replace(/[\:\-]/g, ' ');
-			this.visible = false;
-
-			this.parent.children[0].text = this.text;
-			this.parent.children[0].visible = true;
-			this.parent.children[0].active = true;
-
-			this.parent.parent.children[0].label = this.text;
-		});
-
-		color.swatch.onClick = function () {
-			var colorGrp = this.parent;
-			var swatchesGrp = colorGrp.parent;
-
-			try {
-				this.swatchColor = new colorPicker(this.swatchColor);
-				drawColorSwatch(this, false);
-				saveProjectPalette(swatchesGrp);
-			} catch (err) { }
-		};
+		new swatchListItem(swatchesGrp, tempSwatchesArray[s], tempLabelsArray[s]);
 	}
 
 	var btnGrp = PAL_prefW.add('group');
@@ -299,177 +238,48 @@ function PAL_preferencesDialog() {
 	});
 
 	refreshBtn.addEventListener('click', function (c) {
-		if (c.button == 0) {
-			var tempData = {
-				swatchesArray: [],
-				labelsArray: []
+		var tempData = {
+			swatchesArray: [],
+			labelsArray: []
+		}
+		while (swatchesGrp.children.length > 0) {
+			var colorGrp = swatchesGrp.children[0];
+			var swatch = colorGrp.children[0];
+			tempData.swatchesArray.push(rgbToHEX(swatch.swatchColor));
+			tempData.labelsArray.push(swatch.label);
+			swatchesGrp.remove(colorGrp);
+		}
+		if (c.button == 2) {
+
+			if (ScriptUI.environment.keyboardState.altKey) {
+				panel.layout.layout(true);
+				return;
 			}
-			while (swatchesGrp.children.length > 0) {
-				var colorGrp = swatchesGrp.children[0];
-				var swatch = colorGrp.children[0];
-				tempData.swatchesArray.push(rgbToHEX(swatch.swatchColor));
-				tempData.labelsArray.push(swatch.label);
-				swatchesGrp.remove(colorGrp);
-			}
+
 			var sortedData = sortHex(tempData);
-			var tempSwatchesArray = sortedData.swatchesArray;
-			var tempLabelsArray = sortedData.labelsArray;
+			tempSwatchesArray = sortedData.swatchesArray;
+			tempLabelsArray = sortedData.labelsArray;
 
 			for (var s = 0; s < tempSwatchesArray.length; s++) {
-				var colorGrp = swatchesGrp.add('group');
-				colorGrp.spacing = 8;
-
-				var swatchProperties = {
-					color: tempSwatchesArray[s],
-					label: tempLabelsArray[s],
-					width: 8,
-					height: 26,
-					noEvents: true,
-					index: s
-				};
-				var color = new colorSwatch(colorGrp, swatchProperties);
-
-				txtGrp = colorGrp.add('group');
-				txtGrp.orientation = 'stack';
-
-				var colorNameLab = txtGrp.add('statictext', [0, 0, 160, 26], tempLabelsArray[s]);
-				setCtrlHighlight(colorNameLab, monoColor0, highlightColor1);
-
-				var colorNameTxt = txtGrp.add('edittext', [0, 0, 160, 26], tempLabelsArray[s]);
-				colorNameTxt.visible = false;
-
-				var removeBtn = colorGrp.add('statictext', [0, 0, 8, 26], 'x');
-				setCtrlHighlight(removeBtn, normalColor1, highlightColor1);
-
-				removeBtn.addEventListener('click', function () {
-					this.parent.parent.remove(this.parent);
-
-					PAL_prefW.layout.layout(true);
-					scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;
-				});
-
-				colorNameLab.addEventListener('click', function () {
-					this.visible = false;
-					this.parent.children[1].text = this.text;
-					this.parent.children[1].visible = true;
-					this.parent.children[1].active = true;
-				});
-
-				colorNameTxt.onChange = colorNameTxt.onEnterKey = function () {
-					this.text = this.text.replace(/[\:\-]/g, ' ');
-					this.visible = false;
-
-					this.parent.children[0].text = this.text;
-					this.parent.children[0].visible = true;
-					this.parent.children[0].active = true;
-
-					this.parent.parent.children[0].label = this.text;
-				};
-
-				colorNameTxt.addEventListener('blur', function () {
-					this.text = this.text.replace(/[\:\-]/g, ' ');
-					this.visible = false;
-
-					this.parent.children[0].text = this.text;
-					this.parent.children[0].visible = true;
-					this.parent.children[0].active = true;
-
-					this.parent.parent.children[0].label = this.text;
-				});
-
-				color.swatch.onClick = function () {
-					var colorGrp = this.parent;
-					var swatchesGrp = colorGrp.parent;
-
-					try {
-						this.swatchColor = new colorPicker(this.swatchColor);
-						drawColorSwatch(this, false);
-						saveProjectPalette(swatchesGrp);
-					} catch (err) { }
-				};
+				new swatchListItem(swatchesGrp, tempSwatchesArray[s], tempLabelsArray[s]);
 			}
-			PAL_prefW.layout.layout(true);
 		}
+		if (c.button == 0) {
+			tempSwatchesArray = loadProjectPalette().swatchesArray;
+			tempLabelsArray = loadProjectPalette().labelsArray;
+		
+			for (var s = 0; s < tempSwatchesArray.length; s++) {
+				new swatchListItem(swatchesGrp, tempSwatchesArray[s], tempLabelsArray[s]);
+			}
+		}
+		PAL_prefW.layout.layout(true);
 	});
 
 	addBtn.addEventListener('click', function (c) {
 		if (c.button == 0) {
 			try {
-				var colorGrp = swatchesGrp.add('group');
-				colorGrp.spacing = 8;
+				new swatchListItem(swatchesGrp, new colorPicker(), 'cor ' + (swatchesGrp.children.length + 1));
 
-				var swatchProperties = {
-					color: new colorPicker(),
-					label: 'cor ' + swatchesGrp.children.length,
-					width: 8,
-					height: 26,
-					noEvents: true,
-					index: swatchesGrp.children.length
-				};
-				var color = new colorSwatch(colorGrp, swatchProperties);
-
-				txtGrp = colorGrp.add('group');
-				txtGrp.orientation = 'stack';
-
-				var colorNameLab = txtGrp.add(
-					'statictext',
-					[0, 0, 160, 26],
-					swatchProperties.label
-				);
-				setCtrlHighlight(colorNameLab, monoColor0, highlightColor1);
-
-				var colorNameTxt = txtGrp.add('edittext', [0, 0, 160, 26], swatchProperties.label);
-				colorNameTxt.visible = false;
-
-				var removeBtn = colorGrp.add('statictext', [0, 0, 8, 26], 'x');
-				setCtrlHighlight(removeBtn, normalColor1, highlightColor1);
-
-				removeBtn.addEventListener('click', function () {
-					this.parent.parent.remove(this.parent);
-
-					PAL_prefW.layout.layout(true);
-					scrollBar.maxvalue = swatchesGrp.size.height - panel.size.height;
-				});
-
-				colorNameLab.addEventListener('click', function () {
-					this.visible = false;
-					this.parent.children[1].text = this.text;
-					this.parent.children[1].visible = true;
-					this.parent.children[1].active = true;
-				});
-
-				colorNameTxt.onChange = colorNameTxt.onEnterKey = function () {
-					this.text = this.text.replace(/[\:\-]/g, ' ');
-					this.visible = false;
-
-					this.parent.children[0].text = this.text;
-					this.parent.children[0].visible = true;
-					this.parent.children[0].active = true;
-
-					this.parent.parent.children[0].label = this.text;
-				};
-
-				colorNameTxt.addEventListener('blur', function () {
-					this.text = this.text.replace(/[\:\-]/g, ' ');
-					this.visible = false;
-
-					this.parent.children[0].text = this.text;
-					this.parent.children[0].visible = true;
-					this.parent.children[0].active = true;
-
-					this.parent.parent.children[0].label = this.text;
-				});
-
-				color.swatch.onClick = function () {
-					var colorGrp = this.parent;
-					var swatchesGrp = colorGrp.parent;
-
-					try {
-						this.swatchColor = new colorPicker(this.swatchColor);
-						drawColorSwatch(this, false);
-						saveProjectPalette(swatchesGrp);
-					} catch (err) { }
-				};
 				PAL_prefW.layout.layout(true);
 
 				if (swatchesGrp.children.length > 11) {
