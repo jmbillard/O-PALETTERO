@@ -22,17 +22,19 @@ a interface é responsiva e exibirá todas as informações da forma mais eficie
 
 - **botão +**:\
 `◖ clique esquerdo` → adiciona um nova cor.\
-`◗ clique direito` → adiciona todas as cores de qualquer propriedade ou efeito de todos os layers selecionados.
+`◗ clique direito` → adiciona todas as cores de qualquer propriedade ou efeito de todos os layers selecionados.\
+`Ctrl + ◗ clique direito` → limpa a paleta e adiciona todas as cores de qualquer propriedade ou efeito do projeto.
   >
 
 > 🚩 *obs:*\
-> • caso não exista uma propriedade ou efeito selecionado, ou a cor do mesmo já exista na paleta, o botão + abrirá o editor de cores.\
+> • caso não exista uma propriedade ou efeito selecionado, ou a cor do mesmo já exista na paleta, o botão + abrirá o editor de cores.
 
 <br><br>
 
 - **botão ⇅**:\
 `◖ clique esquerdo` → puxa a paleta do projeto.\
-`◗ clique direito` → ordena a paleta, usando os critérios: *1 - matiz*, *2 - brilho*, *3 - saturação*.
+`◗ clique direito` → ordena a paleta, usando os critérios: *1 - matiz*, *2 - brilho*, *3 - saturação*.\
+`Alt + ◗ clique direito` → excluir todas as cores da paleta.
   >
 
 > 🚩 *obs:*\
@@ -75,6 +77,8 @@ a interface é responsiva e exibirá todas as informações da forma mais eficie
 
 **EXIBIR**:
 
+- **botão 𝒊**:\
+`◖ clique esquerdo` → abre a documentação do script no repositório do GitHub.
 - **informação de cor** → habilita / desabilita a exibição de textos nas amostras de cor.
 - **nome personalizado** → habilita / desabilita a exibição do nome da cor.
 - **#HEX**, **RGB**, **HSB** → exibem seus respectivos valores nas amostras de cor.
@@ -84,11 +88,37 @@ a interface é responsiva e exibirá todas as informações da forma mais eficie
 
 <br><br>
 
+**PALETA**:
+
+- **definir como paleta padrão** → define a lista de cores ao lado como a paleta padrão.
+
+> 🚩 *obs:*\
+> • a paleta padrão é sempre puxada caso não exista nenhuma paleta salva no projeto o clicar no botão ' *⇅* '.
+
+<br><br>
+
 **CORES**:
 
-- **botões de cor** → editar a cor clicada.
-- **nomes de cor** → editar o nome clicado.
-- **X** → remove a cor da lista.
+- **botão ⇅**:\
+`◖ clique esquerdo` → puxa a paleta do projeto.\
+`◗ clique direito` → ordena a paleta, usando os critérios: *1 - matiz*, *2 - brilho*, *3 - saturação*.\
+`Alt + ◗ clique direito` → excluir todas as cores da paleta.
+  >
+
+- **botão +**:\
+`◖ clique esquerdo` → adiciona um nova cor.\
+  >
+
+- **botões de cor**:\
+`◖ clique esquerdo` → editar a cor clicada.
+  >
+
+- **nomes de cor**:\
+`◖ clique esquerdo` → editar o nome clicado.
+  >
+
+- **X**:\
+`◖ clique esquerdo` → remove a cor da lista.
 
 > 🚩 *obs:*\
 > • as alterações feitas nessa seção só serão salvas após clicar no botão '*salvar paleta*'.

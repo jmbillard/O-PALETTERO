@@ -168,6 +168,7 @@
 		editor.gulu.uni.spacing = spacing;
 
 		editor.gulu.uni.Ed = editor.gulu.uni.add('statictext', undefined, 'HEX:');
+		setFgColor(editor.gulu.uni.Ed, monoColor3);
 		editor.gulu.uni.unicode = editor.gulu.uni.add('edittext', undefined, 'FF0000')
 		editor.gulu.uni.unicode.characters = 5;
 		editor.gulu.uni.unicode.justify = 'center';
@@ -185,6 +186,8 @@
 		editor.colorHolder.colorCol1.hGroup.spacing = spacing;
 
 		editor.colorHolder.colorCol1.hGroup.hRad = editor.colorHolder.colorCol1.hGroup.add('statictext', undefined, 'HSB:');
+		setFgColor(editor.colorHolder.colorCol1.hGroup.hRad, monoColor3);
+
 		editor.colorHolder.colorCol1.hGroup.hValue = editor.colorHolder.colorCol1.hGroup.add('edittext', undefined, '0');
 		editor.colorHolder.colorCol1.hGroup.hValue.characters = character;
 		editor.colorHolder.colorCol1.hGroup.hValue.justify = 'center';
@@ -194,6 +197,8 @@
 		editor.colorHolder.colorCol1.rGroup.spacing = spacing;
 
 		editor.colorHolder.colorCol1.rGroup.rRad = editor.colorHolder.colorCol1.rGroup.add('statictext', undefined, 'RGB:');
+		setFgColor(editor.colorHolder.colorCol1.rGroup.rRad, monoColor3);
+
 		editor.colorHolder.colorCol1.rGroup.rValue = editor.colorHolder.colorCol1.rGroup.add('edittext', undefined, '0');
 		editor.colorHolder.colorCol1.rGroup.rValue.characters = character;
 		editor.colorHolder.colorCol1.rGroup.rValue.justify = 'center';
@@ -247,13 +252,30 @@
 
 
 			// editor.oc = win.editor.oc = win.add("Group{ok:Button{text:'aplicar'},can:Button{text:'cancelar'},rem:Button{text:'remover'}}");
-			editor.oc = win.editor.oc = win.add("Group{can:Button{text:'cancelar'},ok:Button{text:'aplicar'}}");
+			var btnGrp = win.add("Group");
+			// editor.oc = win.editor.oc = win.add("Group{can:Button{text:'cancelar'},ok:Button{text:'aplicar'}}");
+			var canBtn = new themeButton(btnGrp, {
+				text: 'cancelar',
+				width: 80,
+				height: 34,
+				buttonColor: monoColor3,
+				textColor: monoColor1
+			});
+			var okBtn = new themeButton(btnGrp, {
+				text: 'aplicar',
+				width: 80,
+				height: 34,
+				buttonColor: monoColor3,
+				textColor: monoColor1
+			});
+			setBgColor(win, monoColor2);
 
-			editor.oc.ok.onClick = function () {
+
+			canBtn.button.onClick = function () {
 				win.close();
 			}
 
-			editor.oc.can.onClick = function () {
+			okBtn.button.onClick = function () {
 				// colorPicker.copyArr(_this.outputColour, _this.inputColour);
 				_this.outputColour = false;
 				win.close();
