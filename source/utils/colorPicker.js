@@ -271,11 +271,11 @@
 			setBgColor(win, monoColor2);
 
 
-			canBtn.button.onClick = function () {
+			okBtn.button.onClick = function () {
 				win.close();
 			}
 
-			okBtn.button.onClick = function () {
+			canBtn.button.onClick = function () {
 				// colorPicker.copyArr(_this.outputColour, _this.inputColour);
 				_this.outputColour = false;
 				win.close();
