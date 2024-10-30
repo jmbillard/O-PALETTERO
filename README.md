@@ -1,4 +1,4 @@
-# 🧾 PALETTERO *script*
+# 🧾 O PALETTERO *script*
 
 🗨️ **pt-BR** ⚡ uma paleta de cores simples para o After Effects ⚡
 
